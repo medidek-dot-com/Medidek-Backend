@@ -8,6 +8,6 @@ Staff.post('/staff', requireUser, upload.single("img"), staffCreation)
 Staff.put('/updateStaffProfile/:staffId', requireUser, upload.single("img"), updateStaffProfile)
 Staff.put('/updateStaffStatusToRemove/:staffId',  updateStaffStatusToRemove)
 // Staff.get('/getstaffForHospital/:staffId', requireUser, getstaffForHospital)
-Staff.get('/getstaff/:id', getStaff)
+Staff.get('/getstaff/:hosp_id', getStaff)
 
  export {Staff} 

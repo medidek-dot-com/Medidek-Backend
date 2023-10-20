@@ -4,13 +4,16 @@ import mongoose from "mongoose";
 const MasterShema = new mongoose.Schema({
     email:{
         type:String,
-        // required:true,
+        required:true,
         unique:true,
         lowercase:true
     },
     password:{
         type:String,
-        // required:true
+        required:true
+    },
+    phone:{
+      type:String,
     },
     nameOfhospitalOrClinic: { type: String },
     hospitalType: { type: String, },
@@ -19,7 +22,6 @@ const MasterShema = new mongoose.Schema({
     enterFullAddress: { type: String },
     img: { type: String },
     role:{type: String, default: "MASTER"},
-    // enterHospitalId:{type:String},
     createddate: { type: Date, default: Date.now() }
 
 })

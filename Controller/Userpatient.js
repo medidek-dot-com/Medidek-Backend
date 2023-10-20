@@ -8,7 +8,160 @@ import { Otp } from "../Models/otpSchema.js";
 import { error, success } from "../Utils/responseWrapper.js";
 import { genrateAccessToken, genrateRefreshToken, sendOTPToEmail } from "./authController.js";
 import bcrypt from 'bcrypt'
-import {cloud} from "./cloudinary/cloudinary.js"
+import { cloud } from "./cloudinary/cloudinary.js"
+import { Doctor } from "../Models/AddDoctors.js";
+import { Master } from "../Models/Master.js";
+import crypto from "crypto";
+
+const isUserExist = async (req, res) => {
+    const { email, phone } = req.body;
+    try {
+        const ispatient = await userpatient.findOne({ $or: [{ email }, { phone }] });
+        const isdoctor = await Doctor.findOne({
+            $or: [{ email },
+            { phone }],
+        });
+        const ishospital = await Master.findOne({ $or: [{ email }, { phone }] });
+        if (ispatient) {
+            return res.send(success(200, ispatient))
+        }
+        else if (isdoctor) {
+            return res.send(success(200, isdoctor))
+        }
+        else if (ishospital) {
+            return res.send(success(200, ishospital))
+        } else {
+            return res.send(error(404, "User not found"))
+        }
+    } catch (e) {
+        return res.send(error(500, e.message));
+    }
+
+
+}
+
+
+const usersignup = async (req, res) => {
+    const { email, password, phone, rol } = req.body;
+    if (!email || !password || !phone || !rol) {
+        return res.status(200).send({ msg: "Pls filled all given field" });
+    }
+    const ispatient = await userpatient.findOne({ email, phone });
+
+    const isdoctor = await Doctor.findOne({
+        email,
+        phone,
+    });
+    const ishospital = await Master.findOne({ email, phone });
+
+    if (ispatient) {
+        return res.send(error(409, "User is already exist"));
+    }
+    if (isdoctor) {
+        return res.send(error(409, "User is already exist"));
+    }
+    if (ishospital) {
+        return res.send(error(409, "User is already exist"));
+    }
+
+    try {
+        if (rol === "PATIENT") {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const user = await userpatient.create({
+                email,
+                phone,
+                password: hashedPassword,
+            });
+            const accessToken = genrateAccessToken({ _id: user._id });
+            return res.send(success(200, { accessToken, user }));
+        } else if (rol === "DOCTOR") {
+            const doctorid = crypto.randomInt(0, 1000000);
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const user = await Doctor.create({
+                email,
+                phone,
+                password: hashedPassword,
+                doctorid,
+            });
+            const accessToken = genrateAccessToken({ _id: user._id });
+            return res.send(success(200, { accessToken, user }));
+        }
+        if (rol === "HOSPITAL") {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const user = await Master.create({ email, password: hashedPassword, phone });
+            const accessToken = genrateAccessToken({ _id: user._id });
+            return res.send(success(200, { accessToken, user }));
+        }
+    } catch (e) {
+        return res.send(error(500, e.message));
+    }
+};
+
+// usersignin for doctor hopital and patient
+
+const usersignin = async (req, res) => {
+    const { email, password, role } = req.body;
+    if (!email || !password || !role) {
+        // return res.status(400).send("All fields are required");
+        return res.send(error(400, "All fields are required"));
+    }
+
+    const ispatient = await userpatient.findOne({ email });
+    const isdoctor = await Doctor.findOne({ email });
+    const ishospital = await Master.findOne({ email });
+
+    try {
+        if(!ispatient && !isdoctor && !ishospital) {
+            return res.send(error(404, "User not registered "));
+        }
+
+        if(ispatient && role!=="PATIENT"    ) {
+            return res.send(error(404, `User exists as Patient. Please signin as Patient`));
+        }
+        if(isdoctor && role!=="DOCTOR"){
+            return res.send(error(404, `User exists as Doctor. Please signin as Doctor`))
+
+        }
+        if(ishospital && role!=="MASTER"){
+            return res.send(error(404, `User exists as Hospital. Please signin as Hospital`))
+
+        }
+
+
+        if (ispatient && role === "PATIENT") {
+            const matched = await bcrypt.compare(password, ispatient.password);
+            if(!matched) {
+                return res.send(error(403,"Incorrect password"))
+            }
+            const accessToken = genrateAccessToken({ _id: ispatient._id });
+
+            return res.send(success(200, { accessToken, ispatient }));
+        }
+        if (isdoctor && role === "DOCTOR") {
+            const matched = await bcrypt.compare(password, isdoctor.password);
+            if(!matched) {
+                return res.send(error(403,"Incorrect password"))
+            }
+            const accessToken = genrateAccessToken({ _id: isdoctor._id });
+            return res.send(success(200, { accessToken, isdoctor }));
+        }
+        if (ishospital && role === "MASTER") {
+            const matched = await bcrypt.compare(password, ishospital.password);
+            if(!matched) {
+                return res.send(error(403,"Incorrect password"))
+            }
+            const accessToken = genrateAccessToken({ _id: ishospital._id });
+            return res.send(success(200, { accessToken, ishospital }));
+        }
+
+
+
+    } catch (e) {
+        res.send(error(500, e.message))
+    }
+};
+
+
 const UserCreation = async (req, res) => {
     // try {
 
@@ -42,15 +195,14 @@ const UserCreation = async (req, res) => {
             return res.send(success(200, `OTP sent successfully to ${email}`));
 
         } else {
-            const saveOtpData = new Otp({ email, otp: OTP });
-            await saveOtpData.save();
+            const saveOtpuser = new Otp({ email, otp: OTP });
+            await saveOtpuser.save();
 
             await sendOTPToEmail(email, OTP)
             return res.send(success(200, `OTP sent successfully to ${email}`));
 
         }
     } catch (e) {
-        console.log(e);
         return res.send(error(400, e.message));
 
     }
@@ -75,12 +227,12 @@ export const varifyOtpAndSignUpPatientController = async (req, res) => {
 
         }
         if (otpverification.otp !== otp) {
-          return  res.send(error(403, "Invalid OTP"))
+            return res.send(error(403, "Invalid OTP"))
         }
         const hashedPassword = await bcrypt.hash(password, 10)
 
         const user = await userpatient.create({ email, password: hashedPassword, phone, name })
-        
+
         const accessToken = genrateAccessToken({
             _id: user._id
         })
@@ -100,7 +252,7 @@ export const varifyOtpAndSignUpPatientController = async (req, res) => {
         // return res.send(success(201, { user }))
 
     } catch (e) {
-        console.log(e.message);
+        return res.send(error(500, e.message));
     }
 };
 
@@ -122,20 +274,20 @@ const sendOtpForResetPassword = async (req, res) => {
             updateOtp.save();
 
             await sendOTPToEmail(email, OTP)
-            return res.send(success(200, {masseage:`OTP sent successfully to ${email}`,_id:user._id}));
+            return res.send(success(200, { masseage: `OTP sent successfully to ${email}`, _id: user._id }));
 
         } else {
-            const saveOtpData = new Otp({ email, otp: OTP  });
-            await saveOtpData.save();
+            const saveOtpuser = new Otp({ email, otp: OTP });
+            await saveOtpuser.save();
 
             await sendOTPToEmail(email, OTP)
-            return res.send(success(200, {masseage:`OTP sent successfully to ${email}`,_id:user._id}));
+            return res.send(success(200, { masseage: `OTP sent successfully to ${email}`, _id: user._id }));
 
         }
 
 
     } catch (e) {
-        console.log(e.message);
+        
         return res.send(error(500, e.message))
     }
 }
@@ -145,25 +297,77 @@ const varifyOtpForResetPassword = async (req, res) => {
     try {
         const varifyOtp = await Otp.findOne({ email: email })
         if (!varifyOtp) {
-           return res.send(error(404, 'User not found'))
+            return res.send(error(404, 'User not found'))
         }
         if (varifyOtp.otp !== otp) {
-           return res.send(error(403, "Invalid OTP"))
+            return res.send(error(403, "Invalid OTP"))
         }
 
-      return  res.send(success(200, "Otp Varified Successfully"))
+        return res.send(success(200, "Otp Varified Successfully"))
 
     } catch (e) {
-        console.log(e.message);
+        
         return res.send(error(500, e.message))
     }
 }
 
+const userforgotpassword = async (req, res) => {
+    const { phone } = req.body;
+    const ispatient = await userpatient.findOne({ phone });
+    const isdoctor = await Doctor.findOne({ enterPhoneNo: phone })
+    const ishospital = await Master.findOne({ phone })
+    try {
+        if (ishospital) {
+            return res.send(success(200, { role: ishospital.role, phone }))
+        }
+        if (isdoctor) {
+            return res.send(success(200, { role: isdoctor.role, phone }))
+        }
+        if (ispatient) {
+            return res.send(success(200, { role: ispatient.role, phone }))
+        } else {
+            return res.send(error(404, "user not found"))
+        }
 
-const ResetPassword =async (req, res)=>{
+    } catch (error) {
+        return res.send(error(500, ("error in backend")))
+    }
+}
+
+// userpassword updated
+
+const userpasswordupdated = async (req, res) => {
+    const { password, role, phone } = req.body;
+    if (role === "PATIENT") {
+        const result = await userpatient.findOne({ phone });
+       
+        const hashedPassword = await bcrypt.hash(password, 10);
+        result.password = hashedPassword;
+        result.save();
+        return res.send(success(200, { msg: "user password updated succesfully" }));
+    }
+    if (role === "DOCTOR") {
+        const result = await Doctor.findOne({ phone });
+ 
+        const hashedPassword = await bcrypt.hash(password, 10);
+        result.password = hashedPassword;
+        result.save();
+        return res.send(success(200, { msg: "user password updated succesfully" }));
+    }
+    if (role === "MASTER") {
+        const result = await Master.findOne({ phone });
+    
+        const hashedPassword = await bcrypt.hash(password, 10);
+        result.password = hashedPassword;
+        result.save();
+        return res.send(success(200, { msg: "user password updated succesfully" }));
+    }
+}
+
+
+const ResetPassword = async (req, res) => {
     try {
         const result = await userpatient.findById(req.params.id)
-        console.log(result);
         const hashedPassword = await bcrypt.hash(req.body.password, 10)
         result.password = hashedPassword
         result.save()
@@ -179,18 +383,6 @@ const ResetPassword =async (req, res)=>{
 
 
 
-// const getDoctorForHospital = async (req, res) => {
-//     try {
-//         console.log(req.params.id,req.params.hosp_id)
-//         let result = await Doctor.find({hospitalId:req.params.hosp_id,_id:req.params.id})
-//         res.send(
-//             success(201, result))
-//     } catch (e) {
-//       res.send(
-//             error(500, e))
-//     }
-// }
-
 const getAllUser = async (req, res) => {
     try {
         let result = await userpatient.find()
@@ -204,18 +396,17 @@ const getAllUser = async (req, res) => {
 
 
 const updateUserpatient = async (req, res) => {
-    const {id} = req.params
-    const {name, email, dateOfBirth, phone, img} = req.body; 
+    const { id } = req.params
+    const { name, email, dateOfBirth, phone, img } = req.body;
     // const file = req.file ? req.file.filename : img;
     try {
         const result = await cloud.uploader.upload(req.file.path);
         const imageUrl = result.secure_url
-        let user = await userpatient.findByIdAndUpdate({_id:id}, { name, email, dateOfBirth, phone, img:imageUrl }, { new: true })
-       return res.send(
+        let user = await userpatient.findByIdAndUpdate({ _id: id }, { name, email, dateOfBirth, phone, img: imageUrl }, { new: true })
+        return res.send(
             success(201, user))
     } catch (e) {
-        console.log(e);
-       return res.send(
+        return res.send(
             error(500, e.message))
     }
 }
@@ -332,34 +523,5 @@ const updateUserpatientPasswordByyApp = async (req, res) => {
 
 
 
-// aws.config.update({
-//     accessKeyId: process.env.AWS_ACCESS_KEY,
-//     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-//     region: process.env.AWS_BUCKET_REGION
-//   });
-  
-//   const s3 = new aws.S3();
-  
-//   // Create a function in your controller to handle S3 uploads
-//   const uploadToS3 = (req, res) => {
-//     const uploadParams = {
-//       Bucket: process.env.AWS_BUCKET,
-//       Key: 'file-name.jpg', // The name to give to the file in S3
-//       Body: 'file-content',  // The file content
-//     };
-  
-//     s3.upload(uploadParams, (err, data) => {
-//       if (err) {
-//         console.error('Error uploading file to S3:', err);
-//         res.status(500).json({ message: 'Error uploading file to S3' });
-//       } else {
-//         console.log('File uploaded successfully:', data.Location);
-//         res.status(200).json({ message: 'File uploaded successfully', url: data.Location });
-//       }
-//     });
-//   };
-  
-  // Export the uploadToS3 function so you can use it in your routes
-
-export { UserCreation, getAllUser, updateUserpatient, FindbyUserNameAndPassoword, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword ,ResetPassword }
+export { UserCreation, getAllUser, updateUserpatient, FindbyUserNameAndPassoword, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, ResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist }
 
