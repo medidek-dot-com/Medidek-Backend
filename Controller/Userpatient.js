@@ -314,7 +314,7 @@ const varifyOtpForResetPassword = async (req, res) => {
 const userforgotpassword = async (req, res) => {
     const { phone } = req.body;
     const ispatient = await userpatient.findOne({ phone });
-    const isdoctor = await Doctor.findOne({ enterPhoneNo: phone })
+    const isdoctor = await Doctor.findOne({  phone })
     const ishospital = await Master.findOne({ phone })
     try {
         if (ishospital) {
