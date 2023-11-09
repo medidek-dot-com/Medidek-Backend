@@ -68,12 +68,20 @@ const editDoctorfile = async (req, res) => {
 
 
 const multipleloginprofile = async (req, res) => {
-  const { doctorid } = req.body;
-  const alldocts = await Doctor.find({ doctorid });
-  for (let doctor of alldocts) {
-    doctor.imgurl = await getObjectSignedUrl(doctor.img)
+  const { doctorid } = req.params;
+  if (!doctorid) {
+    return res.send(error(400, "Pls give doctor id"));
   }
-  return res.send(alldocts);
+  try {
+    const alldocts = await Doctor.find({ doctorid }).populate("hospitalId")
+    for (let doctor of alldocts) {
+      doctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + doctor.img
+    }
+    return res.send(success(200, alldocts));
+  } catch (e) {
+    return res.send(error(500, e.message))
+  }
+
 }
 
 

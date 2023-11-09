@@ -1,7 +1,7 @@
 
 
 import express from 'express'
-import { UserCreation ,getAllUser,ResetPassword ,updateUserpatient ,FindbyUserNameAndPassoword, varifyOtpAndSignUpPatientController, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist } from '../Controller/Userpatient.js';
+import { UserCreation ,getAllUser,ResetPassword ,updateUserpatient ,FindbyUserNameAndPassoword, varifyOtpAndSignUpPatientController, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors } from '../Controller/Userpatient.js';
 import {requireUser} from '../Middleware/requireUser.js'
 import { requirePatient } from '../Middleware/requirePatient.js';
 // import { upload } from '../Multer/petientImgConfig.js';
@@ -22,10 +22,16 @@ userCreationRouter.post('/FindUserByNameAndPassword', usersignin)
 
 userCreationRouter.post('/userpasswordupdated',userpasswordupdated)
 userCreationRouter.post('/forgotpassword',userforgotpassword)
+userCreationRouter.get("/getalldoctors",usergetalldoctors)
 
 // for the native
 userCreationRouter.put('/updateUserpatientByapp/:id', updateUserpatientByyApp)
 userCreationRouter.put('/updateUserpatientPasswordByapp/:id', updateUserpatientPasswordByyApp)
+
+
+userCreationRouter.get('/getusergetalldoctors', usergetalldoctors)
+
+
 
 
 

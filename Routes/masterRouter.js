@@ -18,6 +18,4 @@ masterRouter.get("/getAlldoctor/:hospid",requireUser, alldoctors);
 masterRouter.get("/singledoctor/:id",requireUser,getSingleDoctor)
 masterRouter.get("/singlestaff/:id",requireUser,getSingleStaff)
 
-
-
  export {masterRouter} 

@@ -7,7 +7,7 @@ const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
 
 Router.put('/editDoctorfile/:id',requireUser,upload.single("image"),editDoctorfile);
-Router.get("/multipleloginprofile",requireUser,multipleloginprofile);
+Router.get("/multipleloginprofile/:doctorid",requireUser,multipleloginprofile);
 
 
  export {Router}

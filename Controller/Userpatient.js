@@ -13,6 +13,39 @@ import { Doctor } from "../Models/AddDoctors.js";
 import { Master } from "../Models/Master.js";
 import crypto from "crypto";
 
+
+const usergetalldoctors =async(req,res)=>{
+    try {
+    const alldoctors = await Doctor.find({});
+    let newarr =[];
+    for(let doctor of alldoctors){
+        var getdocts = await Doctor.find({doctorid: doctor.doctorid});
+        if(newarr.length == 0){
+          newarr.push(getdocts[0])
+        }
+        else{
+            for( let i=0; i<newarr.length; i++){
+                let c=i;
+                    if(newarr[c].doctorid === getdocts[0].doctorid){
+                        break;
+                    }
+                else{
+                    c++;
+                }
+               if(c== newarr.length){
+                newarr.push(getdocts[0])
+                break;
+               }
+                }            
+        }
+    }
+    return res.send(success(200,newarr))
+    // return res.send(success(200,alldoctors))
+} catch (e) {
+    return res.send(error(e.message)) 
+}
+}
+
 const isUserExist = async (req, res) => {
     const { email, phone } = req.body;
     try {
@@ -523,5 +556,5 @@ const updateUserpatientPasswordByyApp = async (req, res) => {
 
 
 
-export { UserCreation, getAllUser, updateUserpatient, FindbyUserNameAndPassoword, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, ResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist }
+export { UserCreation, getAllUser, updateUserpatient, FindbyUserNameAndPassoword, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, ResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors }
 
