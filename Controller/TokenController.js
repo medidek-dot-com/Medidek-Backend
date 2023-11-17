@@ -9,8 +9,8 @@ const createToken = async (req, res) => {
         Starttime3,
         Endtime3,
         date,
-        doctorid
-        // istoken
+        doctorid,
+        appointmentByToken
     } = req.body;
     const newdate = new Date(date);
 
@@ -27,7 +27,7 @@ const createToken = async (req, res) => {
                 date: newdate,
                 doctor_id: doctorid
             })
-            return res.send(success(200, { update: updatedslot })); u
+            return res.send(success(200, { update: updatedslot }));
         }
         const createdslot = await Tokens.create({
             Starttime1,

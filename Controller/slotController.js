@@ -12,8 +12,8 @@ const createslot = async (req, res) => {
         Endtime3,
         isholiday,
         date,
-        doctorid
-        // istoken
+        doctorid,
+        isOnlineSlot
     } = req.body;
     const newdate = new Date(date);
 
@@ -32,7 +32,7 @@ const createslot = async (req, res) => {
                 date: newdate,
                 doctor_id: doctorid
             })
-            return res.send(success(200, { update: updatedslot })); u
+            return res.send(success(200, { update: updatedslot }));
         }
         const createdslot = await Slots.create({
             slotduration,

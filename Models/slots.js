@@ -41,6 +41,10 @@ const SlotSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    appointmentBySlot: {
+        type: Boolean,
+        default: true
+    },
 },)
 
 const Slots = mongoose.model("AppointmentSlot", SlotSchema);

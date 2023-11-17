@@ -33,6 +33,10 @@ const TokenSchema = new mongoose.Schema({
         type: String,
         default: 0
     },
+    appointmentByToken: {
+        type: Boolean,
+        default: true
+    },
 },)
 
 const Tokens = mongoose.model("AppointmentToken", TokenSchema);

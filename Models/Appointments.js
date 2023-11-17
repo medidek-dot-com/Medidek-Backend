@@ -35,7 +35,7 @@ const Appointment = new mongoose.Schema({
         type: String,
     },
     // isbookbytoken:{
-    //   type:String,
+    //   type:Boolean,
     //   default:false
     // },
     status:

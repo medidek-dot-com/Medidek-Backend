@@ -14,36 +14,36 @@ import { Master } from "../Models/Master.js";
 import crypto from "crypto";
 
 
-const usergetalldoctors =async(req,res)=>{
+const usergetalldoctors = async (req, res) => {
     try {
-    const alldoctors = await Doctor.find({});
-    let newarr =[];
-    for(let doctor of alldoctors){
-        var getdocts = await Doctor.find({doctorid: doctor.doctorid});
-        if(newarr.length == 0){
-          newarr.push(getdocts[0])
-        }
-        else{
-            for( let i=0; i<newarr.length; i++){
-                let c=i;
-                    if(newarr[c].doctorid === getdocts[0].doctorid){
+        const alldoctors = await Doctor.find({});
+        let newarr = [];
+        for (let doctor of alldoctors) {
+            var getdocts = await Doctor.find({ doctorid: doctor.doctorid });
+            if (newarr.length == 0) {
+                newarr.push(getdocts[0])
+            }
+            else {
+                for (let i = 0; i < newarr.length; i++) {
+                    let c = i;
+                    if (newarr[c].doctorid === getdocts[0].doctorid) {
                         break;
                     }
-                else{
-                    c++;
+                    else {
+                        c++;
+                    }
+                    if (c == newarr.length) {
+                        newarr.push(getdocts[0])
+                        break;
+                    }
                 }
-               if(c== newarr.length){
-                newarr.push(getdocts[0])
-                break;
-               }
-                }            
+            }
         }
+        return res.send(success(200, newarr))
+        // return res.send(success(200,alldoctors))
+    } catch (e) {
+        return res.send(error(e.message))
     }
-    return res.send(success(200,newarr))
-    // return res.send(success(200,alldoctors))
-} catch (e) {
-    return res.send(error(e.message)) 
-}
 }
 
 const isUserExist = async (req, res) => {
@@ -144,18 +144,18 @@ const usersignin = async (req, res) => {
     const ishospital = await Master.findOne({ email });
 
     try {
-        if(!ispatient && !isdoctor && !ishospital) {
+        if (!ispatient && !isdoctor && !ishospital) {
             return res.send(error(404, "User not registered "));
         }
 
-        if(ispatient && role!=="PATIENT"    ) {
+        if (ispatient && role !== "PATIENT") {
             return res.send(error(404, `User exists as Patient. Please signin as Patient`));
         }
-        if(isdoctor && role!=="DOCTOR"){
+        if (isdoctor && role !== "DOCTOR") {
             return res.send(error(404, `User exists as Doctor. Please signin as Doctor`))
 
         }
-        if(ishospital && role!=="MASTER"){
+        if (ishospital && role !== "MASTER") {
             return res.send(error(404, `User exists as Hospital. Please signin as Hospital`))
 
         }
@@ -163,8 +163,8 @@ const usersignin = async (req, res) => {
 
         if (ispatient && role === "PATIENT") {
             const matched = await bcrypt.compare(password, ispatient.password);
-            if(!matched) {
-                return res.send(error(403,"Incorrect password"))
+            if (!matched) {
+                return res.send(error(403, "Incorrect password"))
             }
             const accessToken = genrateAccessToken({ _id: ispatient._id });
 
@@ -172,16 +172,16 @@ const usersignin = async (req, res) => {
         }
         if (isdoctor && role === "DOCTOR") {
             const matched = await bcrypt.compare(password, isdoctor.password);
-            if(!matched) {
-                return res.send(error(403,"Incorrect password"))
+            if (!matched) {
+                return res.send(error(403, "Incorrect password"))
             }
             const accessToken = genrateAccessToken({ _id: isdoctor._id });
             return res.send(success(200, { accessToken, isdoctor }));
         }
         if (ishospital && role === "MASTER") {
             const matched = await bcrypt.compare(password, ishospital.password);
-            if(!matched) {
-                return res.send(error(403,"Incorrect password"))
+            if (!matched) {
+                return res.send(error(403, "Incorrect password"))
             }
             const accessToken = genrateAccessToken({ _id: ishospital._id });
             return res.send(success(200, { accessToken, ishospital }));
@@ -320,7 +320,7 @@ const sendOtpForResetPassword = async (req, res) => {
 
 
     } catch (e) {
-        
+
         return res.send(error(500, e.message))
     }
 }
@@ -339,7 +339,7 @@ const varifyOtpForResetPassword = async (req, res) => {
         return res.send(success(200, "Otp Varified Successfully"))
 
     } catch (e) {
-        
+
         return res.send(error(500, e.message))
     }
 }
@@ -347,7 +347,7 @@ const varifyOtpForResetPassword = async (req, res) => {
 const userforgotpassword = async (req, res) => {
     const { phone } = req.body;
     const ispatient = await userpatient.findOne({ phone });
-    const isdoctor = await Doctor.findOne({  phone })
+    const isdoctor = await Doctor.findOne({ phone })
     const ishospital = await Master.findOne({ phone })
     try {
         if (ishospital) {
@@ -373,7 +373,7 @@ const userpasswordupdated = async (req, res) => {
     const { password, role, phone } = req.body;
     if (role === "PATIENT") {
         const result = await userpatient.findOne({ phone });
-       
+
         const hashedPassword = await bcrypt.hash(password, 10);
         result.password = hashedPassword;
         result.save();
@@ -381,7 +381,7 @@ const userpasswordupdated = async (req, res) => {
     }
     if (role === "DOCTOR") {
         const result = await Doctor.findOne({ phone });
- 
+
         const hashedPassword = await bcrypt.hash(password, 10);
         result.password = hashedPassword;
         result.save();
@@ -389,7 +389,7 @@ const userpasswordupdated = async (req, res) => {
     }
     if (role === "MASTER") {
         const result = await Master.findOne({ phone });
-    
+
         const hashedPassword = await bcrypt.hash(password, 10);
         result.password = hashedPassword;
         result.save();
@@ -554,7 +554,72 @@ const updateUserpatientPasswordByyApp = async (req, res) => {
     }
 }
 
+const changepassword = async (req, res) => {
+    const { id } = req.params;
+    const { oldpassword, newpassword, role } = req.body;
+
+    if (!oldpassword || !newpassword || !id || !role) {
+        return res.send(error(500, "pls filled all field"));
+    }
+    try {
+        if (role === "DOCTOR") {
+            const finduser = await Doctor.findOne({ _id: id });
+            if (finduser) {
+                const matched = await bcrypt.compare(oldpassword, finduser.password);
+                if (matched) {
+                    const hashedPassword = await bcrypt.hash(newpassword, 10);
+                    const changepassword = await Doctor.findByIdAndUpdate({ _id: id }, { password: hashedPassword }, { new: true });
+                    return res.send(success(200, changepassword));
+                }
+                else {
+                    return res.status(409).send({ msg: "your entered password is wrong" });
+                }
+            }
+            else {
+                return res.status(200).send({ msg: "user is not present" });
+            }
+        }
+        if (role === "HOSPITAL") {
+            const finduser = await Master.findOne({ _id: id });
+            if (finduser) {
+                const matched = await bcrypt.compare(oldpassword, finduser.password);
+                if (matched) {
+                    const hashedPassword = await bcrypt.hash(newpassword, 10);
+                    const changepassword = await Master.findByIdAndUpdate({ _id: id }, { password: hashedPassword }, { new: true });
+                    return res.send(success(200, changepassword));
+                }
+                else {
+                    return res.status(409).send({ msg: "your entered password is wrong" });
+                }
+            }
+            else {
+                return res.status(200).send({ msg: "user is not present" });
+            }
+        }
+        if (role === "PATIENT") {
+            const finduser = await userpatient.findOne({ _id: id });
+            if (finduser) {
+                const matched = await bcrypt.compare(oldpassword, finduser.password);
+                if (matched) {
+                    const hashedPassword = await bcrypt.hash(newpassword, 10);
+                    const changepassword = await userpatient.findByIdAndUpdate({ _id: id }, { password: hashedPassword }, { new: true });
+                    return res.send(success(200, changepassword));
+                }
+                else {
+                    return res.send(error(409, "Your entered password is wrong"));
+                }
+            }
+            else {
+                return res.status(200).send({ msg: "user is not present" });
+            }
+        }
+
+    } catch (e) {
+        return res.send(error(500, e.message));
+    }
+}
 
 
-export { UserCreation, getAllUser, updateUserpatient, FindbyUserNameAndPassoword, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, ResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors }
+
+export { UserCreation, getAllUser, updateUserpatient, FindbyUserNameAndPassoword, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, ResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword }
 

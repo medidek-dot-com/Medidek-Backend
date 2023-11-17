@@ -2,7 +2,7 @@ import express from 'express'
 import { getAppoinmentForDoctorInHospital, AppointmentCreation, Instantbooking, getAppointmentForPatient, updateAppointment, getCancelAppointmentForPatient, updateUserAppointmentStatus, getPendingAppointmentsForHospitalAndDoctors, getCompleteAppointmentsForHospitalAndDoctors, getAllAppointmentsForPerticularHospital, getPendingAppointmentsForHospital, getCompleteAppointmentsForHospital, getMissedAppointmentsForHospital, getCompletedAppointmentForPatient, createAppointmentByHospitals, getPendingAppointmentForPatient, getMissedAppointmentsForHospitalAndDoctors } from '../Controller/UserAppointment.js';
 import { requireUser } from '../Middleware/requireUser.js';
 import { requirePatient } from '../Middleware/requirePatient.js';
-import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser } from '../Controller/Appointment.js';
+import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser, getallappointmentofdoctor, getAllPendingAppointmentOfDoctor, getAllCompletedAppointmentOfDoctor, getAllMissedAppointmentOfDoctor } from '../Controller/Appointment.js';
 const Appointment = express.Router();
 
 
@@ -14,12 +14,18 @@ Appointment.get('/getCompleteAppointmentsForHospital/:hosep_id', getCompleteAppo
 Appointment.get('/getMissedAppointmentsForHospital/:hosep_id', getMissedAppointmentsForHospital)
 
 
+//Integreted in website on 10-11-2023 (from here)
+// Get All pending Appointments for Doctor
+Appointment.get('/getPendingAppoinmentForDoctor/:doctorid/:date', requireUser, getAllPendingAppointmentOfDoctor)
+
+// Get All pending Appointments for Doctor
+Appointment.get('/getCompletedAppoinmentForDoctor/:doctorid', requireUser, getAllCompletedAppointmentOfDoctor)
+
+// Get All Missed Appointments for Doctor
+Appointment.get('/getMissedAppoinmentForDoctor/:doctorid', requireUser, getAllMissedAppointmentOfDoctor)
 
 
-Appointment.get('/getAppoinmentForDoctorInHospital/:hosep_id/:doctor_id', requireUser, getAppoinmentForDoctorInHospital)
-
-
-
+//(To here)
 
 
 Appointment.get('/getPendingAppointmentsForHospital/:hosep_id', requireUser, getPendingAppointmentsForHospital)

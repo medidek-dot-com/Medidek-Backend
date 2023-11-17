@@ -72,19 +72,76 @@ const changeappointmentstatus = async (req, res) => {
 
 
 const getallappointmentofdoctor = async (req, res) => {
-    const { Doctorid } = req.body;
-    const allappointment = await AppointmentModel.find({ Doctorid });
+    const { doctorid } = req.params;
+    const allappointment = await AppointmentModel.find({ doctorid }).populate("userid");
     try {
         if (allappointment === null) {
             return res.status(200).send({ msg: "no appointment found by this doctor" });
         }
-        return res.status(200).send(allappointment);
+        return res.send(success(200, allappointment));
     } catch (e) {
-        return res.status(500).send({ msg: "error in backend" });
+        return res.send(error(500, e.message));
+    }
+}
+const getAllPendingAppointmentOfDoctor = async (req, res) => {
+    const { doctorid, date } = req.params;
+    // const { date } = req.query;
+
+    const allappointment = await AppointmentModel.find({
+        $and: [{ doctorid },
+        { status: "pending" },
+        { appointmentDate: date }
+        ]
+    }).populate("userid");
+
+    // ({ doctorid }).populate("userid");
+    try {
+        if (allappointment === null) {
+            return res.status(200).send({ msg: "no appointment found by this doctor" });
+        }
+        return res.send(success(200, allappointment));
+    } catch (e) {
+        return res.send(error(500, e.message));
+    }
+}
+const getAllCompletedAppointmentOfDoctor = async (req, res) => {
+    const { doctorid } = req.params;
+    const allappointment = await AppointmentModel.find({
+        $and: [{ doctorid },
+        { status: "completed" }
+        ]
+    }).populate("userid");
+
+    // ({ doctorid }).populate("userid");
+    try {
+        if (allappointment === null) {
+            return res.status(200).send({ msg: "no appointment found by this doctor" });
+        }
+        return res.send(success(200, allappointment));
+    } catch (e) {
+        return res.send(error(500, e.message));
+    }
+}
+const getAllMissedAppointmentOfDoctor = async (req, res) => {
+    const { doctorid } = req.params;
+    const allappointment = await AppointmentModel.find({
+        $and: [{ doctorid },
+        { status: "missed" }
+        ]
+    }).populate("userid");
+
+    // ({ doctorid }).populate("userid");
+    try {
+        if (allappointment === null) {
+            return res.status(200).send({ msg: "no appointment found by this doctor" });
+        }
+        return res.send(success(200, allappointment));
+    } catch (e) {
+        return res.send(error(500, e.message));
     }
 }
 
-// get all completed appointments for perticular patient
+// get all Pending appointments for perticular patient
 
 const getUpcomingAppointmentForAnUser = async (req, res) => {
     const { Patient_id } = req.params;
@@ -125,6 +182,9 @@ const getCompletedAppointmentsForAnUser = async (req, res) => {
         return res.send(error(500, e.message));
     }
 }
+
+// get all completed appointments for perticular patient
+
 const getMissedAppointmentsForAnUser = async (req, res) => {
     const { Patient_id } = req.params;
     console.log(Patient_id);
@@ -214,8 +274,10 @@ const appointmentstatusfordoctor = async (req, res) => {
 
 export {
     createAppointmnt,
+    getAllPendingAppointmentOfDoctor,
+    getAllCompletedAppointmentOfDoctor,
+    getAllMissedAppointmentOfDoctor,
     getallappointmentofdoctor,
-    getUpcomingAppointmentForAnUser,
     appointmentstatus,
     changeappointmentstatus,
     Totalapatient,
@@ -224,6 +286,7 @@ export {
     Appointmentstatusinpercentage,
     AppointmentBydate,
     appointmentstatusfordoctor,
+    getUpcomingAppointmentForAnUser,
     getCompletedAppointmentsForAnUser,
     getMissedAppointmentsForAnUser
 }

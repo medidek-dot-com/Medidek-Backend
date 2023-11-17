@@ -84,6 +84,38 @@ const multipleloginprofile = async (req, res) => {
 
 }
 
+const acceptAppointmentBySlotEditController = async (req, res) => {
+  const { id } = req.params
+  const { acceptAppointmentBySlot } = req.body
 
-export { editDoctorfile, multipleloginprofile }
+  try {
+    const doctor = await Doctor.findByIdAndUpdate({ _id: id }, { acceptAppointmentBySlot }, { new: true })
+
+    return res.send(success(200, doctor))
+
+  } catch (e) {
+    return res.send(error(500, e.message))
+  }
+
+}
+const acceptAppointmentByTokenEditController = async (req, res) => {
+  const { id } = req.params
+  const { acceptAppointmentByToken } = req.body
+
+  try {
+    const doctor = await Doctor.findByIdAndUpdate({ _id: id }, { acceptAppointmentByToken }, { new: true })
+
+    return res.send(success(200, doctor))
+
+  } catch (e) {
+    return res.send(error(500, e.message))
+  }
+
+}
+
+
+
+
+
+export { editDoctorfile, multipleloginprofile, acceptAppointmentBySlotEditController, acceptAppointmentByTokenEditController }
 
