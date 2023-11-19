@@ -1,7 +1,7 @@
 
 
 import express from 'express'
-import { UserCreation, getAllUser, ResetPassword, updateUserpatient, FindbyUserNameAndPassoword, varifyOtpAndSignUpPatientController, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword } from '../Controller/Userpatient.js';
+import { UserCreation, getAllUser, ResetPassword, FindbyUserNameAndPassoword, varifyOtpAndSignUpPatientController, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword, userprofileupdate } from '../Controller/Userpatient.js';
 import { requireUser } from '../Middleware/requireUser.js'
 import { requirePatient } from '../Middleware/requirePatient.js';
 // import { upload } from '../Multer/petientImgConfig.js';
@@ -10,6 +10,8 @@ const upload = multer({ dest: "uploads/" });
 const userCreationRouter = express.Router();
 
 userCreationRouter.put('/changepassword/:id', requireUser, changepassword);
+// userCreationRouter.put('/updateuserpatient/:id', requirePatient, upload.single("img"), updateUserpatient)
+userCreationRouter.put('/updateuserpatient/:id', requireUser, upload.single("image"), userprofileupdate);
 
 userCreationRouter.post('/isUserExist', isUserExist)
 
@@ -21,7 +23,6 @@ userCreationRouter.post('/varifyOtpForResetPassword', varifyOtpForResetPassword)
 userCreationRouter.put('/ResetPassword/:id', ResetPassword)
 userCreationRouter.get('/getAllUser', requirePatient, getAllUser)
 userCreationRouter.get('/getSinglePetient/:id', requirePatient, getSinglePetient)
-userCreationRouter.put('/updateuserpatient/:id', requirePatient, upload.single("img"), updateUserpatient)
 userCreationRouter.post('/FindUserByNameAndPassword', usersignin)
 
 userCreationRouter.post('/userpasswordupdated', userpasswordupdated)

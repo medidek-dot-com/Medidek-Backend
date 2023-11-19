@@ -29,11 +29,101 @@ const createAppointmnt = async (req, res) => {
 
 
     try {
-        const isappointmentexist = await AppointmentModel.findOne({ $and: [{ doctorid }, { userid }, { appointmentDate }] })
-        if (isappointmentexist) {
+        const isappointmentexist = await AppointmentModel.findOne({ $and: [{ doctorid }, { userid }, { appointmentDate }, { status: "pending" }] });
+        console.log("aappoointcoming: " + isappointmentexist);
+        if (isappointmentexist !== null) {
             return res.send(error(409, "Appointment is already exist"));
+            // else {
+            //     const Appointmentdata = await AppointmentModel.create({
+            //         doctorid,
+            //         userid,
+            //         name,
+            //         age,
+            //         gender,
+            //         phone,
+            //         AppointmentNotes,
+            //         appointmentDate,
+            //         AppointmentTime
+            //     })
+            //     console.log("aappooint aa gyi" + isappointmentexist);
+            //     return res.send(success(201, Appointmentdata));
+            //     // return res.send(error(409, "Appointment is already exist"));
+            // }
+
         }
-        const Appointmentdata = await AppointmentModel.create({
+        // else if (isappointmentexist !== null && isappointmentexist.status === "pending") {
+        //     console.log("aappooint gyi" + isappointmentexist);
+        //     return res.send(error(409, "Appointment is already exist"));
+        // }
+        // else if (isappointmentexist === null) {
+        //     const Appointmentdata = await AppointmentModel.create({
+        //         doctorid,
+        //         userid,
+        //         name,
+        //         age,
+        //         gender,
+        //         phone,
+        //         AppointmentNotes,
+        //         appointmentDate,
+        //         AppointmentTime
+        //     })
+        //     console.log("aappooint ho gyi" + isappointmentexist);
+
+        //     return res.send(success(201, Appointmentdata));
+        // }
+        else {
+            const Appointmentdata = await AppointmentModel.create({
+                doctorid,
+                userid,
+                name,
+                age,
+                gender,
+                phone,
+                AppointmentNotes,
+                appointmentDate,
+                AppointmentTime
+            })
+            await Appointmentdata.populate(["doctorid", "userid"])
+            console.log("aappooint aa gyi" + isappointmentexist);
+            return res.send(success(201, Appointmentdata))
+        }
+
+    } catch (e) {
+        console.log(e)
+        return res.send(error(500, e.message));
+    }
+}
+
+const updateAppointmnt = async (req, res) => {
+    const { appointmentId } = req.params;
+    const {
+        doctorid,
+        userid,
+        name,
+        age,
+        gender,
+        phone,
+        AppointmentNotes,
+        appointmentDate,
+        AppointmentTime,
+    } = req.body;
+
+    if (
+        !doctorid ||
+        !userid ||
+        !name ||
+        !age ||
+        !gender ||
+        !phone ||
+        !appointmentDate ||
+        !AppointmentNotes ||
+        !AppointmentTime) {
+        return res.send(error(400, "all fields  required"));
+    }
+
+
+    try {
+        const appointmentupdated = await AppointmentModel.findByIdAndUpdate({ _id: appointmentId }, {
             doctorid,
             userid,
             name,
@@ -43,10 +133,10 @@ const createAppointmnt = async (req, res) => {
             AppointmentNotes,
             appointmentDate,
             AppointmentTime
-        })
-        return res.send(success(201, Appointmentdata));
+        }, { new: true });
+        return res.send(success(200, appointmentupdated));
     } catch (e) {
-        return res.send(error(500, e.message));
+        return res.send(error(e.message));
     }
 }
 
@@ -60,13 +150,27 @@ const appointmentstatus = async (req, res) => {
     }
 }
 
-const changeappointmentstatus = async (req, res) => {
-    const { Doctorid, status } = req.body;
+const getsingleappointmentbyid = async (req, res) => {
+    const { appointmentId, status } = req.params;
+    if (!appointmentId) {
+        return res.send(error(400, "id is required"));
+    }
     try {
-        const chnageappointmentstatusbydoctor = await AppointmentModel.findByIdAndUpdate({ Doctorid }, { status }, { new: true });
-        return res.status(200).send("status changed succesfully");
-    } catch (error) {
-        return res.status(500).send(error);
+        const singleappointment = await AppointmentModel.findOne({ $and: [{ _id: appointmentId }, { status }] }).populate("doctorid")
+        return res.send(success(200, singleappointment));
+    } catch (e) {
+        return res.send(error(500, e.message));
+    }
+}
+
+const changeappointmentstatus = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    try {
+        const chnageappointmentstatusbydoctor = await AppointmentModel.findByIdAndUpdate({ _id: id }, { status }, { new: true });
+        return res.send(success(200, "status changed succesfully"));
+    } catch (e) {
+        return res.send(error(500, e.message));
     }
 }
 
@@ -188,22 +292,43 @@ const getCompletedAppointmentsForAnUser = async (req, res) => {
 const getMissedAppointmentsForAnUser = async (req, res) => {
     const { Patient_id } = req.params;
     console.log(Patient_id);
-    const allappointment = await AppointmentModel.find({
-        $and: [{ userid: Patient_id },
-        { status: "missed" }
-        ]
-    }).populate("doctorid");
-    console.log(allappointment)
-    // $and: [{ doctor_id: doctorid }, { date: newdate }]
+
     try {
-        if (allappointment === null) {
-            return res.send(error(404, "no appointment found by this doctor"));
+        const allappointment = await AppointmentModel.find({
+            userid: Patient_id,
+            status: { $in: ["missed", "cancelled"] }
+        }).populate("doctorid");
+
+        if (!allappointment || allappointment.length === 0) {
+            return res.send(error(404, "No appointments found for this user."));
         }
+
         return res.send(success(200, allappointment));
     } catch (e) {
         return res.send(error(500, e.message));
     }
 }
+
+
+// const getMissedAppointmentsForAnUser = async (req, res) => {
+//     const { Patient_id } = req.params;
+//     console.log(Patient_id);
+//     const allappointment = await AppointmentModel.find({
+//         $and: [{ userid: Patient_id },
+//     { status: "missed" }, { status: "pending" }
+//         ]
+//     }).populate("doctorid");
+//     console.log(allappointment)
+//     // $and: [{ doctor_id: doctorid }, { date: newdate }]
+//     try {
+//         if (allappointment === null) {
+//             return res.send(error(404, "no appointment found by this doctor"));
+//         }
+//         return res.send(success(200, allappointment));
+//     } catch (e) {
+//         return res.send(error(500, e.message));
+//     }
+// }
 
 const Totalapatient = async (req, res) => {
     const { Doctorid } = req.body;
@@ -288,5 +413,7 @@ export {
     appointmentstatusfordoctor,
     getUpcomingAppointmentForAnUser,
     getCompletedAppointmentsForAnUser,
-    getMissedAppointmentsForAnUser
+    getMissedAppointmentsForAnUser,
+    getsingleappointmentbyid,
+    updateAppointmnt
 }

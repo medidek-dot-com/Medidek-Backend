@@ -20,7 +20,7 @@ const hospitalprofileupdate = async (req, res) => {
     imgurl
   } = req.body;
 
- 
+
   if (
     !nameOfhospitalOrClinic ||
     !hospitalType ||
@@ -30,10 +30,10 @@ const hospitalprofileupdate = async (req, res) => {
   ) {
     return res.send(error(409, "pls filled all field in given fields"));
   }
-  const imageName = file ?  generateFileName() : imgurl;
+  const imageName = file ? generateFileName() : imgurl;
   const fileBuffer = file?.buffer;
   if (fileBuffer) {
-await uploadFile(fileBuffer, imageName, file.mimetype);
+    await uploadFile(fileBuffer, imageName, file.mimetype);
   }
   try {
     const data = await Master.findByIdAndUpdate(
@@ -49,10 +49,10 @@ await uploadFile(fileBuffer, imageName, file.mimetype);
       { new: true }
     ).select("-password")
 
-    data.imgurl ="https://d26dtlo3dcke63.cloudfront.net/"+data.img
+    data.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + data.img
     await data.save();
 
-    res.send(success(200,data));
+    res.send(success(200, data));
   } catch (e) {
     res.send(error(500, e.message));
   }
@@ -67,19 +67,19 @@ const getdoctorbytheirid = async (req, res) => {
 
   // let hospitalId = "5349b4ddd2781d08c09890f3";
   try {
-    const isdoctoravailableinhospital = await Doctor.findOne({$and:[{doctorid},{hospitalId}]})
-    if(isdoctoravailableinhospital){
-      return res.send(error(403,"this doctor already available in your hospital"))
+    const isdoctoravailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId }] })
+    if (isdoctoravailableinhospital) {
+      return res.send(error(403, "this doctor already available in your hospital"))
     }
     const doctorinfo = await Doctor.findOne({
-     $and:[ {doctorid: doctorid},{ hospitalId:"6531c8f389aee1b3fbd0a2d7"}]
+      $and: [{ doctorid: doctorid }, { hospitalId: "6531c8f389aee1b3fbd0a2d7" }]
     });
-    if(!doctorinfo){
+    if (!doctorinfo) {
       return res.send(error(404, "Invalid doctor id"))
     }
     return res.send(success(200, doctorinfo));
   } catch (e) {
-    res.send(error(500,e.message));
+    res.send(error(500, e.message));
   }
 };
 
@@ -116,20 +116,20 @@ const addDoctorbyhospital = async (req, res) => {
   ) {
     return res.send(error(401, "All fields are compulsory"));
   }
- 
+
   try {
-    const isdoctoravailableinhospital = await Doctor.findOne({$and:[{doctorid},{hospitalId:hospitalid}]})
-    if(isdoctoravailableinhospital){
-      return res.send(error(500,{msg:"this doctor already available in your hospital"}))
+    const isdoctoravailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId: hospitalid }] })
+    if (isdoctoravailableinhospital) {
+      return res.send(error(500, { msg: "this doctor already available in your hospital" }))
     }
 
-    const isdoctoravailable = await Doctor.findOne({ doctorid});
-    if(!isdoctoravailable){
-      return res.send(error(500,{msg:"This doctorid does not exist"}));
+    const isdoctoravailable = await Doctor.findOne({ doctorid });
+    if (!isdoctoravailable) {
+      return res.send(error(500, { msg: "This doctorid does not exist" }));
     }
-    const imageName = file ?  generateFileName() : imgurl;
+    const imageName = file ? generateFileName() : imgurl;
     const fileBuffer = file?.buffer;
-    if(fileBuffer){
+    if (fileBuffer) {
       await uploadFile(fileBuffer, imageName, file.mimetype);
     }
     if (isdoctoravailable) {
@@ -141,8 +141,8 @@ const addDoctorbyhospital = async (req, res) => {
         email,
         phone,
         connsultationFee,
-      hospitalId: hospitalid,
-        img:imageName,
+        hospitalId: hospitalid,
+        img: imageName,
         doctorid,
         category1,
         category2,
@@ -150,23 +150,21 @@ const addDoctorbyhospital = async (req, res) => {
         category4,
         description,
       });
-      addDoctor.imgurl ="https://d26dtlo3dcke63.cloudfront.net/"+addDoctor.img
+      addDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + addDoctor.img
       return res.send(success(200, { addDoctor }));
     }
-  
+
   } catch (e) {
-    res.send(error(500, e.message ));
+    res.send(error(500, e.message));
   }
 };
 
 const getSingleDoctor = async (req, res) => {
   try {
-    let result = await Doctor.findById(req.params.id).populate([
-      "reviews",
-      "hospitalId",
-    ]);
+    let result = await Doctor.findById(req.params.id).populate("reviews");
+    await result.populate("reviews.userid");
     console.log(result);
-    result.imgurl ="https://d26dtlo3dcke63.cloudfront.net/"+result.img
+    result.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + result.img
 
     res.send(success(201, result));
   } catch (e) {
@@ -177,7 +175,7 @@ const getSingleDoctor = async (req, res) => {
 const getSingleStaff = async (req, res) => {
   try {
     let result = await staff.findById(req.params.id);
-    result.imgurl ="https://d26dtlo3dcke63.cloudfront.net/"+result.img
+    result.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + result.img
     res.send(success(201, result));
   } catch (error) {
     return res.send(error(500, e));
@@ -186,7 +184,7 @@ const getSingleStaff = async (req, res) => {
 
 const editDoctorbyhospital = async (req, res) => {
   const { hospitalid } = req.params;
-  const   file =req.file;
+  const file = req.file;
   const {
     nameOfTheDoctor,
     qulification,
@@ -213,19 +211,19 @@ const editDoctorbyhospital = async (req, res) => {
     !phone ||
     !password ||
     !connsultationFee ||
-    !doctorid 
+    !doctorid
   ) {
     return res.send(error(404, { msg: "All fields are compulsory" }));
   }
   try {
-    const imageName = file ?  generateFileName() :"6d27d5a62d61ead2a0084c78fb31307afd5fed6e9e42c49feb9efdbf03423061";
+    const imageName = file ? generateFileName() : "6d27d5a62d61ead2a0084c78fb31307afd5fed6e9e42c49feb9efdbf03423061";
     const fileBuffer = file?.buffer;
-    if(fileBuffer){
+    if (fileBuffer) {
       await uploadFile(fileBuffer, imageName, file.mimetype);
     }
-  
+
     const editDoctor = await Doctor.findOneAndUpdate(
-      { $and:[{doctorid},{ hospitalId: hospitalid}] },
+      { $and: [{ doctorid }, { hospitalId: hospitalid }] },
       {
         nameOfTheDoctor,
         qulification,
@@ -237,7 +235,7 @@ const editDoctorbyhospital = async (req, res) => {
         connsultationFee,
         hospitalId: hospitalid,
         doctorid,
-        img:imageName,
+        img: imageName,
         category1,
         category2,
         category3,
@@ -247,7 +245,7 @@ const editDoctorbyhospital = async (req, res) => {
       { new: true }
     );
 
-    editDoctor.imgurl ="https://d26dtlo3dcke63.cloudfront.net/"+editDoctor.img
+    editDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + editDoctor.img
     return res.send(success(200, { editDoctor }));
   } catch (error) {
     res.status(500).send({ error, status: "error", code: 500 });
@@ -255,7 +253,7 @@ const editDoctorbyhospital = async (req, res) => {
 };
 
 const AddStaff = async (req, res) => {
-  const file =req.file;
+  const file = req.file;
   const {
     nameOfStaff,
     designation,
@@ -265,7 +263,7 @@ const AddStaff = async (req, res) => {
     gender,
     // dob,
   } = req.body;
-console.log(req.body);
+  console.log(req.body);
   if (
     !nameOfStaff ||
     !designation ||
@@ -275,12 +273,12 @@ console.log(req.body);
     !gender
     // !dob
   ) {
-    return res.send(error(400,"pls filled all field"));
+    return res.send(error(400, "pls filled all field"));
   }
 
-  const imageName = file ?  generateFileName() :"6d27d5a62d61ead2a0084c78fb31307afd5fed6e9e42c49feb9efdbf03423061";
+  const imageName = file ? generateFileName() : "6d27d5a62d61ead2a0084c78fb31307afd5fed6e9e42c49feb9efdbf03423061";
   const fileBuffer = file?.buffer;
-  if(fileBuffer){
+  if (fileBuffer) {
     await uploadFile(fileBuffer, imageName, file.mimetype);
   }
 
@@ -293,9 +291,9 @@ console.log(req.body);
       phone,
       hospitalId,
       // dob,
-      img:imageName,
+      img: imageName,
     });
-    result.imgurl ="https://d26dtlo3dcke63.cloudfront.net/"+result.img
+    result.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + result.img
     return res.send(success(201, result));
   } catch (e) {
     return res.send(error(500, e.message));
@@ -303,7 +301,7 @@ console.log(req.body);
 };
 
 const editStaff = async (req, res) => {
-  const file =req.file;
+  const file = req.file;
   const { id } = req.params;
   const {
     nameOfStaff,
@@ -315,7 +313,7 @@ const editStaff = async (req, res) => {
     dob,
   } = req.body;
 
-  const imageName = file ?  generateFileName() : "";
+  const imageName = file ? generateFileName() : "";
   const fileBuffer = file.buffer;
   await uploadFile(fileBuffer, imageName, file.mimetype);
 
@@ -330,7 +328,7 @@ const editStaff = async (req, res) => {
         hospitalId,
         gender,
         dob,
-        img:imageName,
+        img: imageName,
       },
       { new: true }
     );
@@ -365,7 +363,7 @@ const alldoctors = async (req, res) => {
   try {
     const alldoctors = await Doctor.find({ hospitalId: hospid });
     for (let doctor of alldoctors) {
-      doctor.imgurl ="https://d26dtlo3dcke63.cloudfront.net/"+doctor.img
+      doctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + doctor.img
     }
     // alldoctors.imgurl = await getObjectSignedUrl(alldoctors.img);
     // allstaffs.imgurl = await getObjectSignedUrl(allstaffs.img);

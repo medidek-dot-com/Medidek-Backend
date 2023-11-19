@@ -2,7 +2,7 @@ import express from 'express'
 import { getAppoinmentForDoctorInHospital, AppointmentCreation, Instantbooking, getAppointmentForPatient, updateAppointment, getCancelAppointmentForPatient, updateUserAppointmentStatus, getPendingAppointmentsForHospitalAndDoctors, getCompleteAppointmentsForHospitalAndDoctors, getAllAppointmentsForPerticularHospital, getPendingAppointmentsForHospital, getCompleteAppointmentsForHospital, getMissedAppointmentsForHospital, getCompletedAppointmentForPatient, createAppointmentByHospitals, getPendingAppointmentForPatient, getMissedAppointmentsForHospitalAndDoctors } from '../Controller/UserAppointment.js';
 import { requireUser } from '../Middleware/requireUser.js';
 import { requirePatient } from '../Middleware/requirePatient.js';
-import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser, getallappointmentofdoctor, getAllPendingAppointmentOfDoctor, getAllCompletedAppointmentOfDoctor, getAllMissedAppointmentOfDoctor } from '../Controller/Appointment.js';
+import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser, getallappointmentofdoctor, getAllPendingAppointmentOfDoctor, getAllCompletedAppointmentOfDoctor, getAllMissedAppointmentOfDoctor, changeappointmentstatus, getsingleappointmentbyid } from '../Controller/Appointment.js';
 const Appointment = express.Router();
 
 
@@ -67,10 +67,12 @@ Appointment.get("/getCompletedAppointment/:Patient_id", requireUser, getComplete
 
 Appointment.get("/getMissedAppointment/:Patient_id", requireUser, getMissedAppointmentsForAnUser)
 
+Appointment.get("/getsingleappointmentbyid/:appointmentId/:status", requireUser, getsingleappointmentbyid)
+
 
 Appointment.put("/updateUserAppointment/:id", requireUser, updateAppointment)
 
-Appointment.put('/updateUserAppointmentStatus/:Patient_id', requireUser, updateUserAppointmentStatus)
+Appointment.put('/updateUserAppointmentStatus/:id', requireUser, changeappointmentstatus)
 
 
 Appointment.get("/getCancelAppointment/:Patient_id", requireUser, getCancelAppointmentForPatient)

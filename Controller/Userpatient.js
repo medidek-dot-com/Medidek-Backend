@@ -14,6 +14,10 @@ import { Master } from "../Models/Master.js";
 import crypto from "crypto";
 
 
+const generateFileName = (bytes = 32) =>
+    crypto.randomBytes(bytes).toString("hex");
+
+
 const usergetalldoctors = async (req, res) => {
     try {
         const alldoctors = await Doctor.find({});
@@ -427,22 +431,32 @@ const getAllUser = async (req, res) => {
     }
 }
 
+const userprofileupdate = async (req, res) => {
+    const { id } = req.params;
+    const { name, email, dateOfBirth, phone, imgurl, gender } = req.body;
+    if (!name || !email || !dateOfBirth || !phone, !gender) {
+        return res.send(error(409, "pls filled all field"));
+    }
+    const file = req.file;
 
-const updateUserpatient = async (req, res) => {
-    const { id } = req.params
-    const { name, email, dateOfBirth, phone, img } = req.body;
-    // const file = req.file ? req.file.filename : img;
+    const imageName = file ? generateFileName() : imgurl;
+    const fileBuffer = file?.buffer;
+
     try {
-        const result = await cloud.uploader.upload(req.file.path);
-        const imageUrl = result.secure_url
-        let user = await userpatient.findByIdAndUpdate({ _id: id }, { name, email, dateOfBirth, phone, img: imageUrl }, { new: true })
-        return res.send(
-            success(201, user))
+        if (fileBuffer) {
+            await uploadFile(fileBuffer, imageName, file.mimetype)
+        }
+        const data = await userpatient.findByIdAndUpdate({ _id: id }, {
+            name, email, dateOfBirth, phone, img: imageName, gender
+        }, { new: true })
+        data.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + data.img
+        await data.save();
+        return res.send(success(200, data));
     } catch (e) {
-        return res.send(
-            error(500, e.message))
+        return res.send(error(500, e.message))
     }
 }
+
 
 //Sign in with JWT
 
@@ -621,5 +635,5 @@ const changepassword = async (req, res) => {
 
 
 
-export { UserCreation, getAllUser, updateUserpatient, FindbyUserNameAndPassoword, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, ResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword }
+export { UserCreation, getAllUser, FindbyUserNameAndPassoword, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, ResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword, userprofileupdate }
 

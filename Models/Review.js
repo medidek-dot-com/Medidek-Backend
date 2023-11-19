@@ -1,17 +1,23 @@
 
 import mongoose from "mongoose";
-const MasterShema =new mongoose.Schema({
-    name:{type:String },
-    doctorId:{type:String,default:"Document"},
-    rating:{type:String},
-    masseage:{type:String},
+const MasterShema = new mongoose.Schema({
+    doctorid: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Doctor"
+    },
+    userid: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "userpatient"
+    },
+    rating: { type: Number },
+    message: { type: String },
     // connsultationFee:{type:String}, 
-    createddate:{type:Date, default: Date.now()}
+    createddate: { type: Date, default: Date.now() }
 })
 
-const Review= mongoose.model("Review",MasterShema)
+const Review = mongoose.model("Review", MasterShema)
 
-export {Review}
+export { Review }
 
 
 
