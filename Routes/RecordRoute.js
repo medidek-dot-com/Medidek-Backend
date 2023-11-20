@@ -9,7 +9,7 @@ const upload = multer({ storage: storage })
 const Record = express.Router();
 
 Record.post('/uploadRecord/:id', requireUser, upload.single("image"), RecordCreation)
-Record.get("/getRecordOfPatient", getRecordforPatient)
+Record.get("/getRecordOfPatient/:id", requireUser, getRecordforPatient)
 
 export { Record }
 

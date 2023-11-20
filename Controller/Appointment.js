@@ -106,6 +106,7 @@ const updateAppointmnt = async (req, res) => {
         AppointmentNotes,
         appointmentDate,
         AppointmentTime,
+        status
     } = req.body;
 
     if (
@@ -117,7 +118,8 @@ const updateAppointmnt = async (req, res) => {
         !phone ||
         !appointmentDate ||
         !AppointmentNotes ||
-        !AppointmentTime) {
+        !AppointmentTime ||
+        !status) {
         return res.send(error(400, "all fields  required"));
     }
 
@@ -132,7 +134,8 @@ const updateAppointmnt = async (req, res) => {
             phone,
             AppointmentNotes,
             appointmentDate,
-            AppointmentTime
+            AppointmentTime,
+            status,
         }, { new: true });
         return res.send(success(200, appointmentupdated));
     } catch (e) {
@@ -237,7 +240,7 @@ const getAllMissedAppointmentOfDoctor = async (req, res) => {
     // ({ doctorid }).populate("userid");
     try {
         if (allappointment === null) {
-            return res.status(200).send({ msg: "no appointment found by this doctor" });
+            return res.send(error(404, "no appointment found by this doctor"));
         }
         return res.send(success(200, allappointment));
     } catch (e) {
