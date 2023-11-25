@@ -13,6 +13,7 @@ const createAppointmnt = async (req, res) => {
         AppointmentNotes,
         appointmentDate,
         AppointmentTime,
+        role
     } = req.body;
 
     if (
@@ -24,58 +25,17 @@ const createAppointmnt = async (req, res) => {
         !phone ||
         !appointmentDate ||
         !AppointmentNotes ||
+        !role ||
         !AppointmentTime) {
         return res.send(error(400, "all fields  required"));
     }
 
 
     try {
-        const isappointmentexist = await AppointmentModel.findOne({ $and: [{ doctorid }, { userid }, { appointmentDate }, { status: "pending" }] });
-        console.log("aappoointcoming: " + isappointmentexist);
-        if (isappointmentexist !== null) {
-            return res.send(error(409, "Appointment is already exist"));
-            // else {
-            //     const Appointmentdata = await AppointmentModel.create({
-            //         doctorid,
-            //         userid,
-            //         name,
-            //         age,
-            //         gender,
-            //         phone,
-            //         AppointmentNotes,
-            //         appointmentDate,
-            //         AppointmentTime
-            //     })
-            //     console.log("aappooint aa gyi" + isappointmentexist);
-            //     return res.send(success(201, Appointmentdata));
-            //     // return res.send(error(409, "Appointment is already exist"));
-            // }
-
-        }
-        // else if (isappointmentexist !== null && isappointmentexist.status === "pending") {
-        //     console.log("aappooint gyi" + isappointmentexist);
-        //     return res.send(error(409, "Appointment is already exist"));
-        // }
-        // else if (isappointmentexist === null) {
-        //     const Appointmentdata = await AppointmentModel.create({
-        //         doctorid,
-        //         userid,
-        //         name,
-        //         age,
-        //         gender,
-        //         phone,
-        //         AppointmentNotes,
-        //         appointmentDate,
-        //         AppointmentTime
-        //     })
-        //     console.log("aappooint ho gyi" + isappointmentexist);
-
-        //     return res.send(success(201, Appointmentdata));
-        // }
-        else {
+        if (role === "MASTER") {
             const Appointmentdata = await AppointmentModel.create({
                 doctorid,
-                userid,
+                hospitalid: userid,
                 name,
                 age,
                 gender,
@@ -84,13 +44,33 @@ const createAppointmnt = async (req, res) => {
                 appointmentDate,
                 AppointmentTime
             })
-            await Appointmentdata.populate(["doctorid", "userid"])
-            console.log("aappooint aa gyi" + isappointmentexist);
+            // await Appointmentdata.populate(["doctorid", "hospitalid"])
+            // console.log("aappooint aa gyi" + isappointmentexist);
+            return res.send(success(201, Appointmentdata))
+
+        }
+        const isappointmentexist = await AppointmentModel.findOne({ $and: [{ doctorid }, { userid }, { appointmentDate }, { status: "pending" }] });
+        console.log("aappoointcoming: " + isappointmentexist);
+        if (isappointmentexist !== null) {
+            return res.send(error(409, "Appointment is already exist"));
+        }
+        else {
+            const Appointmentdata = await AppointmentModel.create({
+                doctorid,
+                userid: userid,
+                name,
+                age,
+                gender,
+                phone,
+                AppointmentNotes,
+                appointmentDate,
+                AppointmentTime
+            })
+            // await Appointmentdata.populate(["doctorid", "userid"])
             return res.send(success(201, Appointmentdata))
         }
 
     } catch (e) {
-        console.log(e)
         return res.send(error(500, e.message));
     }
 }
@@ -254,22 +234,41 @@ const getAllMissedAppointmentOfDoctor = async (req, res) => {
 // get all Pending appointments for perticular patient
 
 const getUpcomingAppointmentForAnUser = async (req, res) => {
-    const { Patient_id } = req.params;
+    const { Patient_id, doctorid } = req.params;
     console.log(Patient_id);
-    const allappointment = await AppointmentModel.find({
-        $and: [{ userid: Patient_id },
-        { status: "pending" }
-        ]
-    }).populate("doctorid");
-
-    try {
-        if (allappointment === null) {
-            return res.send(error(404, "no appointment found by this doctor"));
+    if (doctorid) {
+        const allappointment = await AppointmentModel.find({
+            $and: [{ doctorid: doctorid },
+            { status: "pending" }
+            ]
+        }).populate("doctorid");
+        try {
+            if (allappointment === null) {
+                return res.send(error(404, "no appointment found by this doctor"));
+            }
+            return res.send(success(200, allappointment));
+        } catch (e) {
+            return res.send(error(500, e.message));
         }
-        return res.send(success(200, allappointment));
-    } catch (e) {
-        return res.send(error(500, e.message));
     }
+    if (Patient_id) {
+        const allappointment = await AppointmentModel.find({
+            $and: [{ userid: Patient_id },
+            { status: "pending" }
+            ]
+        }).populate("doctorid");
+        try {
+            if (allappointment === null) {
+                return res.send(error(404, "no appointment found by this doctor"));
+            }
+            return res.send(success(200, allappointment));
+        } catch (e) {
+            return res.send(error(500, e.message));
+        }
+    }
+
+
+
 }
 
 // get all completed appointments for perticular patient
@@ -314,6 +313,64 @@ const getMissedAppointmentsForAnUser = async (req, res) => {
         return res.send(error(500, e.message));
     }
 }
+
+
+
+
+
+const getallappointmentsforparticularhospitalidpending = async (req, res) => {
+    const { hospitalid, date } = req.params;
+    const newdate = new Date(date)
+    if (!hospitalid) {
+        return res.send(error(404, "filed missing required parameter"))
+    }
+    try {
+        const allappointment = await AppointmentModel.find({
+            $and: [{ hospitalid }, { status: "pending" }, { appointmentDate: newdate }]
+        }).populate("doctorid")
+        return res.send(success(200, allappointment))
+    } catch (e) {
+        return res.send(error(500, e.message))
+    }
+}
+const getallappointmentsforparticularhospitalidcompleted = async (req, res) => {
+    const { hospitalid, date } = req.params;
+    const newdate = new Date(date)
+    if (!hospitalid) {
+        return res.send(error(404, "filed missing required parameter"))
+    }
+    try {
+        const allappointment = await AppointmentModel.find({
+            $and: [{ hospitalid }, { status: "completed" }, { appointmentDate: newdate }]
+        }).populate("doctorid")
+        return res.send(success(200, allappointment))
+    } catch (e) {
+        return res.send(error(500, e.message))
+    }
+}
+const getallappointmentsforparticularhospitalidmissed = async (req, res) => {
+    const { hospitalid, date } = req.params;
+    const newdate = new Date(date)
+    if (!hospitalid) {
+        return res.send(error(404, "filed missing required parameter"))
+    }
+    try {
+        const allappointment = await AppointmentModel.find({
+            $and: [{ hospitalid }, { status: "missed" }, { appointmentDate: newdate }]
+        }).populate("doctorid")
+        return res.send(success(200, allappointment))
+    } catch (e) {
+        return res.send(error(500, e.message))
+    }
+}
+
+
+
+
+
+
+
+
 
 
 // const getMissedAppointmentsForAnUser = async (req, res) => {
@@ -425,6 +482,9 @@ const appointmentstatusfordoctor = async (req, res) => {
 }
 
 export {
+    getallappointmentsforparticularhospitalidmissed,
+    getallappointmentsforparticularhospitalidcompleted,
+    getallappointmentsforparticularhospitalidpending,
     createAppointmnt,
     getAllPendingAppointmentOfDoctor,
     getAllCompletedAppointmentOfDoctor,

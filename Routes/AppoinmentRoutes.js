@@ -2,16 +2,31 @@ import express from 'express'
 import { getAppoinmentForDoctorInHospital, AppointmentCreation, Instantbooking, getAppointmentForPatient, updateAppointment, getCancelAppointmentForPatient, updateUserAppointmentStatus, getPendingAppointmentsForHospitalAndDoctors, getCompleteAppointmentsForHospitalAndDoctors, getAllAppointmentsForPerticularHospital, getPendingAppointmentsForHospital, getCompleteAppointmentsForHospital, getMissedAppointmentsForHospital, getCompletedAppointmentForPatient, createAppointmentByHospitals, getPendingAppointmentForPatient, getMissedAppointmentsForHospitalAndDoctors } from '../Controller/UserAppointment.js';
 import { requireUser } from '../Middleware/requireUser.js';
 import { requirePatient } from '../Middleware/requirePatient.js';
-import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser, getallappointmentofdoctor, getAllPendingAppointmentOfDoctor, getAllCompletedAppointmentOfDoctor, getAllMissedAppointmentOfDoctor, changeappointmentstatus, getsingleappointmentbyid, Appointmentstatusinpercentage, TodayAppointment, Totalapatient, Futureappointment } from '../Controller/Appointment.js';
+import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser, getallappointmentofdoctor, getAllPendingAppointmentOfDoctor, getAllCompletedAppointmentOfDoctor, getAllMissedAppointmentOfDoctor, changeappointmentstatus, getsingleappointmentbyid, Appointmentstatusinpercentage, TodayAppointment, Totalapatient, Futureappointment, getallappointmentsforparticularhospitalidpending, getallappointmentsforparticularhospitalidcompleted, getallappointmentsforparticularhospitalidmissed } from '../Controller/Appointment.js';
 const Appointment = express.Router();
 
 
-Appointment.get('/getAllAppointmentsForPerticularHospital/:hosep_id', getAllAppointmentsForPerticularHospital)
-
-Appointment.get('/getCompleteAppointmentsForHospital/:hosep_id', getCompleteAppointmentsForHospital)
 
 
-Appointment.get('/getMissedAppointmentsForHospital/:hosep_id', getMissedAppointmentsForHospital)
+
+
+
+Appointment.get('/getAllAppointmentsForPerticularHospital/:hospitalid/:date', getallappointmentsforparticularhospitalidpending)
+
+Appointment.get('/getCompleteAppointmentsForHospital/:hospitalid/:date', getallappointmentsforparticularhospitalidcompleted)
+
+
+Appointment.get('/getMissedAppointmentsForHospital/:hospitalid/:date',
+    getallappointmentsforparticularhospitalidmissed)
+
+
+
+
+
+
+
+
+
 
 
 //Integreted in website on 10-11-2023 (from here)
@@ -69,6 +84,7 @@ Appointment.get('/getPatientAppointment/:Patient_id', requireUser, getAppointmen
 
 // 1. Get All pending appointments for perticular patient
 Appointment.get('/getPendingAppointmentForPatient/:Patient_id', requireUser, getUpcomingAppointmentForAnUser)
+Appointment.get('/getPendingAppointmentForDoctor/:doctorid', requireUser, getUpcomingAppointmentForAnUser)
 
 // 2. Get All completed appointments for perticular patient
 
