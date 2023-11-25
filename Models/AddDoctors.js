@@ -69,14 +69,15 @@ const MasterShema = new mongoose.Schema({
         type: String,
         default: "url"
     },
-    acceptAppointmentBySlot: {
-        type: Boolean,
-        default: false
+    acceptAppointments: {
+        type: String,
+        required: true,
+        default: "byToken"
     },
-    acceptAppointmentByToken: {
-        type: Boolean,
-        default: false
-    },
+    // acceptAppointmentByToken: {
+    //     type: Boolean,
+    //     default: false
+    // },
 
 })
 

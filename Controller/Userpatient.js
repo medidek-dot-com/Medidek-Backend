@@ -586,7 +586,7 @@ const changepassword = async (req, res) => {
                     return res.send(success(200, changepassword));
                 }
                 else {
-                    return res.status(409).send({ msg: "your entered password is wrong" });
+                    return res.send(error(409, "Your entered password is wrong"));
                 }
             }
             else {

@@ -16,7 +16,9 @@ const createslot = async (req, res) => {
         isOnlineSlot
     } = req.body;
     const newdate = new Date(date);
-
+    if (!doctorid || !date) {
+        return res.send(error(400, "all fields are required"))
+    }
     try {
         const isslotalready = await Slots.findOne({ $and: [{ doctor_id: doctorid }, { date: newdate }] });
         if (isslotalready) {
@@ -48,7 +50,6 @@ const createslot = async (req, res) => {
         })
         return res.send(success(200, { create: createdslot }));
     } catch (e) {
-        console.log(e)
         return res.send(error(e.messege));
     }
 
@@ -56,8 +57,9 @@ const createslot = async (req, res) => {
 
 const getslot = async (req, res) => {
     const { date, doctorid } = req.params
-    // const { date } = req.body;
-    console.log("thisi s date", date)
+    if (!doctorid || !date) {
+        return res.send(error(400, "all fields are required"))
+    }
     const newdate = new Date(date);
     try {
         const data = await Slots.findOne({
@@ -72,61 +74,73 @@ const getslot = async (req, res) => {
 const userslot = async (req, res) => {
     const { doctorid, date } = req.params;
     const newdate = new Date(date)
-    console.log(newdate);
+
     try {
         const isslotavailable = await Slots.findOne({ $and: [{ doctor_id: doctorid }, { date: newdate }] });
         if (isslotavailable !== null) {
-            console.log(isslotavailable)
-            console.log("object is already available");
+            let slots1 = [];
+            let slots2 = [];
+            let slots3 = [];
+            const SD = isslotavailable.slotduration;
+            const slotDuration = SD;
+            // isslotavailable)
+            // "object is already available");
             // Define the starttimes and endtimes
             const startTime1 = isslotavailable.Starttime1;
-            const cb = startTime1?.split(" ");
-            const newb = cb[0]?.split(":");
-            const SD = isslotavailable.slotduration;
-            const starthour = newb[0];
-            const format = cb[1];
-            const slotDuration = SD;
-
             const endTime1 = isslotavailable.Endtime1;
-            const cbb = endTime1?.split(" ");
-            const newbb = cbb[0]?.split(":");
-            const endhour = newbb[0];
-            const endformat = cbb[1];
-            // Define the starttimes and endtimes
+            if (startTime1 && startTime1 !== 0 && endTime1 && endTime1 !== 0) {
+                const cb = startTime1?.split(" ");
+                const newb = cb[0]?.split(":");
+                // const SD = isslotavailable.slotduration;
+                const starthour = newb[0];
+                const format = cb[1];
+                // const slotDuration = SD;
+
+                const cbb = endTime1?.split(" ");
+                const newbb = cbb[0]?.split(":");
+                const endhour = newbb[0];
+                const endformat = cbb && cbb[1];
+                // Define the starttimes and endtimes
+                slots1 = genrateSlots(starthour, endhour, slotDuration, format, endformat)
+            }
 
 
             const startTime2 = isslotavailable.Starttime2;
-            const cb1 = startTime2?.split(" ");
-            const newb1 = cb1[0].split(":");
-            // const SD1 = newb1[1];
-            const starthour1 = newb1 && newb1[0];
-            const format1 = cb[1];
-            // const slotDuration1 = SD1;
-
             const endTime2 = isslotavailable.Endtime2;
-            const cbb1 = endTime2?.split(" ");
-            const newbb1 = cbb1[0]?.split(":");
-            const endhour1 = newbb1 && newbb1[0];
-            const endformat1 = cbb1[1];
-            // Define the starttimes and endtimes
+            if (startTime2 && startTime2 !== 0 && endTime2 && endTime2 !== 0) {
+                const cb1 = startTime2?.split(" ");
+                const newb1 = cb1[0].split(":");
+                // const SD1 = newb1[1];
+                const starthour1 = newb1 && newb1[0];
+                const format1 = cb1 && cb1[1];
+                // const slotDuration1 = SD1;
+
+                const cbb1 = endTime2?.split(" ");
+                const newbb1 = cbb1[0]?.split(":");
+                const endhour1 = newbb1 && newbb1[0];
+                const endformat1 = cbb1[1];
+                // Define the starttimes and endtimes
+                slots2 = genrateSlots(starthour1, endhour1, slotDuration, format1, endformat1)
+            }
+
 
             const startTime3 = isslotavailable.Starttime3;
-            const cb2 = startTime3?.split(" ");
-            const newb2 = cb2[0]?.split(":");
-            const SD2 = newb2[1];
-            const starthour2 = newb2 && newb2[0];
-            const format2 = cb2[1];
-            // const slotDuration2 = SD;
-
             const endTime3 = isslotavailable.Endtime3;
-            const cbb2 = endTime3?.split(" ");
-            const newbb2 = cbb2[0]?.split(":");
-            const endhour2 = newbb2 && newbb2[0];
-            const endformat2 = cbb && cbb[1];
+            if (startTime3 && startTime3 !== 0 && endTime3 && endTime3 !== 0) {
+                const cb2 = startTime3?.split(" ");
+                const newb2 = cb2[0]?.split(":");
+                const SD2 = newb2[1];
+                const starthour2 = newb2 && newb2[0];
+                const format2 = cb2[1];
+                // const slotDuration2 = SD;
 
-            const slots1 = genrateSlots(starthour, endhour, slotDuration, format, endformat)
-            const slots2 = genrateSlots(starthour1, endhour1, slotDuration, format1, endformat1)
-            const slots3 = genrateSlots(starthour2, endhour2, slotDuration, format2, endformat2)
+                const cbb2 = endTime3?.split(" ");
+                const newbb2 = cbb2[0]?.split(":");
+                const endhour2 = newbb2 && newbb2[0];
+                const endformat2 = cbb2 && cbb2[1];
+                slots3 = genrateSlots(starthour2, endhour2, slotDuration, format2, endformat2)
+            }
+
             const comparray = [...slots1, ...slots2, ...slots3];
             return res.send(success(200, comparray));
         }
@@ -151,32 +165,27 @@ const genrateSlots = (startTime, endTime, slotDuration, format, endformat) => {
     let d = 12;
     // Calculate the number of slots
     if (startTime < 12 && endTime < 12 && format === "AM" && endformat === "AM") {
-        console.log(endTime, startTime);
         var numberOfSlots = Math.floor(((endTime - startTime) * 60) / slotDuration);
-        console.log(numberOfSlots)
+
     }
     else if (startTime <= 12 && endTime >= 1 && format === "AM" && endformat === "PM") {
         if (parseInt(endTime) !== 12) {
             c = c + parseInt(endTime);
         }
-        console.log(slotDuration);
-        console.log((((c - startTime) * 60) / slotDuration))
+
         var numberOfSlots = Math.floor(((c - startTime) * 60) / slotDuration);
-        console.log(numberOfSlots)
 
     }
     else if (startTime <= 12 && endTime < 12 && format === "PM" && endformat === "PM") {
         d = d + startTime;
         c = c + endTime;
-        console.log(c, d);
         var numberOfSlots = Math.floor(((c - d) * 60) / slotDuration);
-        // console.log(numberOfSlots)
+        // numberOfSlots)
     }
     else if (startTime < 12 && endTime >= 1 && format === "PM" && endformat === "AM") {
         c = c + endTime;
-        console.log((c - startTime) * 60 / slotDuration)
         var numberOfSlots = Math.floor(((c - startTime) * 60) / slotDuration);
-        // console.log(numberOfSlots)
+        // numberOfSlots)
     }
     else {
         return null;
@@ -191,12 +200,12 @@ const genrateSlots = (startTime, endTime, slotDuration, format, endformat) => {
         const modifiedDate = originalDate.set({ hour: parseInt(startTime), minute: 0, second: 0 });
         const a = modifiedDate.format()
         // // const newdate = new Date(a);
-        // // console.log(newdate);
+        // // newdate);
         // // const fom = newdate.setMinutes(0)
         // // const fom2 = newdate.setSeconds(0)
         // // const fom3 = newdate.setMilliseconds(0);
         // const format  = newdate.toISOString().slice(0,13);
-        // console.log(newdate,format);
+        // newdate,format);
         const startTimeOfSlot = moment(a).add(i * slotDuration, 'minutes');
         const endTimeOfSlot = moment(startTimeOfSlot).add(slotDuration, 'minutes');
         if (endTimeOfSlot.format('hh:mm A') == endlastDate.format('hh:mm A')) {

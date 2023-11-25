@@ -1,3 +1,4 @@
+import moment from "moment/moment.js";
 import { AppointmentModel } from "../Models/Appointments.js"
 import { success, error } from "../Utils/responseWrapper.js";
 
@@ -168,9 +169,9 @@ const getsingleappointmentbyid = async (req, res) => {
 
 const changeappointmentstatus = async (req, res) => {
     const { id } = req.params;
-    const { status } = req.body;
+    const { status, remark } = req.body;
     try {
-        const chnageappointmentstatusbydoctor = await AppointmentModel.findByIdAndUpdate({ _id: id }, { status }, { new: true });
+        const chnageappointmentstatusbydoctor = await AppointmentModel.findByIdAndUpdate({ _id: id }, { status, remark }, { new: true });
         return res.send(success(200, "status changed succesfully"));
     } catch (e) {
         return res.send(error(500, e.message));
@@ -199,7 +200,7 @@ const getAllPendingAppointmentOfDoctor = async (req, res) => {
         { status: "pending" },
         { appointmentDate: date }
         ]
-    }).populate("userid");
+    }).populate(["userid"]);
 
     // ({ doctorid }).populate("userid");
     try {
@@ -212,10 +213,11 @@ const getAllPendingAppointmentOfDoctor = async (req, res) => {
     }
 }
 const getAllCompletedAppointmentOfDoctor = async (req, res) => {
-    const { doctorid } = req.params;
+    const { doctorid, date } = req.params;
     const allappointment = await AppointmentModel.find({
         $and: [{ doctorid },
-        { status: "completed" }
+        { status: "completed" },
+        { appointmentDate: date }
         ]
     }).populate("userid");
 
@@ -230,10 +232,11 @@ const getAllCompletedAppointmentOfDoctor = async (req, res) => {
     }
 }
 const getAllMissedAppointmentOfDoctor = async (req, res) => {
-    const { doctorid } = req.params;
+    const { doctorid, date } = req.params;
     const allappointment = await AppointmentModel.find({
         $and: [{ doctorid },
-        { status: "missed" }
+        { status: { $in: ["missed", "cancelled"] } },
+        { appointmentDate: date }
         ]
     }).populate("userid");
 
@@ -334,49 +337,70 @@ const getMissedAppointmentsForAnUser = async (req, res) => {
 // }
 
 const Totalapatient = async (req, res) => {
-    const { Doctorid } = req.body;
+    const { doctorid, date } = req.params;
+    const newdate = new Date(date);
+    const year = newdate.getFullYear()
+    const month = newdate.getMonth();
+    const intialdate = `${year}-${month}-01`
+    const intialdat = new Date(intialdate);
+    console.log("this is initil date", intialdat)
+
     try {
-        const allpatient = await AppointmentModel.find({ Doctorid });
-        return res.status(200).send(allpatient);
-    } catch (error) {
-        return res.status(500).send(error);
+        const allpatient = await AppointmentModel.
+            find({ $and: [{ doctorid }, { appointmentDate: { $gte: intialdat } }, { appointmentDate: { $lte: newdate } }] }).countDocuments();
+        return res.send(success(200, allpatient));
+    } catch (e) {
+        return res.send(error(e.message));
     }
 }
 
 const TodayAppointment = async (req, res) => {
-    const { Doctorid } = req.body;
-    const today = new Date().toLocaleDateString();
+    const { doctorid, date } = req.params;
+    const today = new Date(date)
     try {
-        const aajkiappointment = await AppointmentModel.find({ $and: [{ Doctorid }, { AppointmentDate: today }] });
-        return res.status(200).send(aajkiappointment);
-    } catch (error) {
-        return res.status(500).send(error);
+        const totalAppointments = await AppointmentModel.find({ $and: [{ doctorid }, { appointmentDate: today }] }).countDocuments();
+        const completeAppointments = await AppointmentModel.find({
+            $and: [{ doctorid },
+            { status: { $in: ["missed", "cancelled", "completed"] } },
+            { appointmentDate: today }
+            ]
+        }).countDocuments();
+        // awaiit aajkiappointment.C
+        return res.send(success(200, { totalAppointments, completeAppointments }));
+    } catch (e) {
+        return res.send(error(500, e.message));
     }
 }
 
 const Futureappointment = async (req, res) => {
-    const { Doctorid } = req.body;
+    const { doctorid } = req.params;
+    const today = moment().format("YYYY-MM-DD")
+    const date = new Date(today);
     try {
-        const newappointment = await AppointmentModel.find({ $and: [{ Doctorid }, { status: "pending" }] });
-        return res.status(200).send(newappointment);
-    } catch (error) {
-        return res.status(500).send(error);
+        const newappointment = await AppointmentModel.
+            find({ $and: [{ doctorid }, { status: "pending" }, { appointmentDate: { $gte: date } }] }).countDocuments();
+        return res.send(success(200, newappointment));
+    } catch (e) {
+        return res.send(error(500, e.message));
     }
 }
 
 const Appointmentstatusinpercentage = async (req, res) => {
-    const { Doctorid } = req.body;
+    const { doctorid, date } = req.params;
+    console.log(doctorid, date);
+    const stringdate = new Date(date)
     try {
-        const totalappointment = await AppointmentModel.find({ Doctorid });
-        const pendingapointment = await AppointmentModel.find({ $and: [{ Doctorid }, { status: "pending" }] });
-        const completedappointment = await AppointmentModel.find({ $and: [{ Doctorid }, { status: "completed" }] });
-        const cancelledapointment = await AppointmentModel.find({ $and: [{ Doctorid }, { status: "cancelled" }] });
-        const PA = (totalappointment * pendingapointment) / 100;
-        const COMPA = (totalappointment * completedappointment) / 100;
-        const CA = (totalappointment * cancelledapointment) / 100;
-        return res.status(200).send({ pending: PA, completed: COMPA, cancelled: CA });
-    } catch (error) {
-        return res.status(500).send(error);
+        const totalappointment = await AppointmentModel.find({ $and: [{ doctorid }, { appointmentDate: stringdate }] }).countDocuments();
+        const pendingapointment = await AppointmentModel.find({ $and: [{ doctorid }, { status: "pending" }, { appointmentDate: stringdate }] }).countDocuments();
+        const completedappointment = await AppointmentModel.find({ $and: [{ doctorid }, { status: "completed" }, { appointmentDate: stringdate }] }).countDocuments();
+        const cancelledapointment = await AppointmentModel.find({ $and: [{ doctorid }, { status: "cancelled" }, { appointmentDate: stringdate }] }).countDocuments();
+        console.log(totalappointment, completedappointment)
+        const PA = (100 * pendingapointment) / totalappointment;
+        const COMPA = (100 * completedappointment) / totalappointment;
+        const CA = (100 * cancelledapointment) / totalappointment;
+        return res.send(success(200, { pending: PA, completed: COMPA, cancelled: CA }));
+    } catch (e) {
+        return res.send(error(e.message));
     }
 }
 

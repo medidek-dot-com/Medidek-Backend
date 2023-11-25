@@ -24,13 +24,14 @@ const editDoctorfile = async (req, res) => {
     description,
     email,
     phone,
+    acceptAppointments,
     imgurl
   } = req.body
   const file = req.file
 
 
   if (!nameOfTheDoctor || !qulification || !speciality
-    || !yearOfExprience || !connsultationFee || !email || !phone
+    || !yearOfExprience || !connsultationFee || !email || !phone || !acceptAppointments
   ) {
     return res.send(error(500, { msg: "pls filled all field" }));
   }
@@ -54,15 +55,16 @@ const editDoctorfile = async (req, res) => {
       category4,
       description,
       email,
-      phone
+      phone,
+      acceptAppointments
     }, { new: true });
     data.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + data.img
     await data.save();
     console.log("request coming from db");
     res.send(success(200, data));
 
-  } catch (error) {
-    res.status(500).send(error)
+  } catch (e) {
+    res.send(error(500, e.message));
   }
 }
 

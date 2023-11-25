@@ -41,7 +41,6 @@ const createToken = async (req, res) => {
         })
         return res.send(success(200, { create: createdslot }));
     } catch (e) {
-        console.log(e)
         return res.send(error(e.messege));
     }
 
@@ -50,7 +49,6 @@ const createToken = async (req, res) => {
 const getToken = async (req, res) => {
     const { date, doctorid } = req.params
     // const { date } = req.body;
-    console.log("thisi s date", date)
     const newdate = new Date(date);
     try {
         const data = await Tokens.findOne({

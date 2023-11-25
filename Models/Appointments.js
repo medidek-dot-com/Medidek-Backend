@@ -43,6 +43,9 @@ const Appointment = new mongoose.Schema({
         type: String,
         default: "pending"
     },
+    remark: {
+        type: String,
+    }
 })
 
 const AppointmentModel = mongoose.model("Appointment", Appointment);
