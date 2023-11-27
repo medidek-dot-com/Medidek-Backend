@@ -52,6 +52,14 @@ const hospitalprofileupdate = async (req, res) => {
     data.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + data.img
     await data.save();
 
+
+    var hospid = data._id;
+    const result = await Doctor.find({ hospitalId: hospid });
+    for (let newloaction of result) {
+      newloaction.location = data.location;
+      await newloaction.save();
+    }
+    // await result.save();
     res.send(success(200, data));
   } catch (e) {
     res.send(error(500, e.message));
@@ -101,6 +109,7 @@ const addDoctorbyhospital = async (req, res) => {
     category3,
     category4,
     description,
+    location
   } = req.body;
 
   if (
@@ -112,7 +121,8 @@ const addDoctorbyhospital = async (req, res) => {
     !phone ||
     !connsultationFee ||
     !doctorid ||
-    !hospitalid
+    !hospitalid ||
+    !location
   ) {
     return res.send(error(401, "All fields are compulsory"));
   }
@@ -149,6 +159,7 @@ const addDoctorbyhospital = async (req, res) => {
         category3,
         category4,
         description,
+        location
       });
       addDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + addDoctor.img
       return res.send(success(200, { addDoctor }));

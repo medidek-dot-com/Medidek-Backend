@@ -23,6 +23,10 @@ const MasterShema = new mongoose.Schema({
     connsultationFee: {
         type: Number
     },
+    location: {
+        type: String,
+        default: null
+    },
     hospitalId:
     {
         type: mongoose.Schema.Types.ObjectId, ref: 'Master',

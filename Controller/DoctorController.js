@@ -25,13 +25,17 @@ const editDoctorfile = async (req, res) => {
     email,
     phone,
     acceptAppointments,
-    imgurl
+    imgurl,
+    location
   } = req.body
   const file = req.file
 
 
+  console.log("doctori profile", location)
+
+
   if (!nameOfTheDoctor || !qulification || !speciality
-    || !yearOfExprience || !connsultationFee || !email || !phone || !acceptAppointments
+    || !yearOfExprience || !connsultationFee || !email || !phone || !acceptAppointments || !location
   ) {
     return res.send(error(500, { msg: "pls filled all field" }));
   }
@@ -56,7 +60,8 @@ const editDoctorfile = async (req, res) => {
       description,
       email,
       phone,
-      acceptAppointments
+      acceptAppointments,
+      location
     }, { new: true });
     data.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + data.img
     await data.save();
