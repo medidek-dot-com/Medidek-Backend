@@ -16,6 +16,7 @@ const createslot = async (req, res) => {
         isOnlineSlot
     } = req.body;
     const newdate = new Date(date);
+    console.log(req.body);
     if (!doctorid || !date) {
         return res.send(error(400, "all fields are required"))
     }
@@ -101,7 +102,7 @@ const userslot = async (req, res) => {
                 const endhour = newbb[0];
                 const endformat = cbb && cbb[1];
                 // Define the starttimes and endtimes
-                slots1 = genrateSlots(starthour, endhour, slotDuration, format, endformat)
+                slots1 = genrateSlots(starthour, endhour, slotDuration)
             }
 
 
@@ -120,7 +121,7 @@ const userslot = async (req, res) => {
                 const endhour1 = newbb1 && newbb1[0];
                 const endformat1 = cbb1[1];
                 // Define the starttimes and endtimes
-                slots2 = genrateSlots(starthour1, endhour1, slotDuration, format1, endformat1)
+                slots2 = genrateSlots(starthour1, endhour1, slotDuration)
             }
 
 
@@ -138,7 +139,7 @@ const userslot = async (req, res) => {
                 const newbb2 = cbb2[0]?.split(":");
                 const endhour2 = newbb2 && newbb2[0];
                 const endformat2 = cbb2 && cbb2[1];
-                slots3 = genrateSlots(starthour2, endhour2, slotDuration, format2, endformat2)
+                slots3 = genrateSlots(starthour2, endhour2, slotDuration)
             }
 
             const comparray = [...slots1, ...slots2, ...slots3];
@@ -155,44 +156,47 @@ const userslot = async (req, res) => {
 };
 
 
-const genrateSlots = (startTime, endTime, slotDuration, format, endformat) => {
+const genrateSlots = (startTime, endTime, slotDuration) => {
     // Initialize the slots array
     const start = moment().hour(parseInt(endTime))
     const originalDate = moment(start);
     const endlastDate = originalDate.set({ hour: parseInt(endTime), minute: slotDuration, second: 0 });
     const slots = [];
+    var numberOfSlots = Math.floor(((endTime - startTime) * 60) / slotDuration);
+
     let c = 12;
     let d = 12;
+
     // Calculate the number of slots
-    if (startTime < 12 && endTime < 12 && format === "AM" && endformat === "AM") {
-        var numberOfSlots = Math.floor(((endTime - startTime) * 60) / slotDuration);
+    // if (startTime < 12 && endTime < 12 && format === "AM" && endformat === "AM") {
+    //     var numberOfSlots = Math.floor(((endTime - startTime) * 60) / slotDuration);
 
-    }
-    else if (startTime <= 12 && endTime >= 1 && format === "AM" && endformat === "PM") {
-        if (parseInt(endTime) !== 12) {
-            c = c + parseInt(endTime);
-        }
+    // }
+    // else if (startTime <= 12 && endTime >= 1 && format === "AM" && endformat === "PM") {
+    //     if (parseInt(endTime) !== 12) {
+    //         c = c + parseInt(endTime);
+    //     }
 
-        var numberOfSlots = Math.floor(((c - startTime) * 60) / slotDuration);
+    //     var numberOfSlots = Math.floor(((c - startTime) * 60) / slotDuration);
 
-    }
-    else if (startTime <= 12 && endTime < 12 && format === "PM" && endformat === "PM") {
-        d = d + startTime;
-        c = c + endTime;
-        var numberOfSlots = Math.floor(((c - d) * 60) / slotDuration);
-        // numberOfSlots)
-    }
-    else if (startTime < 12 && endTime >= 1 && format === "PM" && endformat === "AM") {
-        c = c + endTime;
-        var numberOfSlots = Math.floor(((c - startTime) * 60) / slotDuration);
-        // numberOfSlots)
-    }
-    else {
-        return null;
-    }
+    // }
+    // else if (startTime <= 12 && endTime < 12 && format === "PM" && endformat === "PM") {
+    //     d = d + startTime;
+    //     c = c + endTime;
+    //     var numberOfSlots = Math.floor(((c - d) * 60) / slotDuration);
+    //     // numberOfSlots)
+    // }
+    // else if (startTime < 12 && endTime >= 1 && format === "PM" && endformat === "AM") {
+    //     c = c + endTime;
+    //     var numberOfSlots = Math.floor(((c - startTime) * 60) / slotDuration);
+    //     // numberOfSlots)
+    // }
+    // else {
+    //     return null;
+    // }
 
     //   Iterate over the slots
-    for (let i = 1; i <= numberOfSlots; i++) {
+    for (let i = 0; i <= numberOfSlots + 1; i++) {
         // Calculate the start and end times for each slot
         // const start = moment().add(startTime,'hour').set('hour');
         const start = moment().hour(parseInt(startTime))
@@ -207,14 +211,15 @@ const genrateSlots = (startTime, endTime, slotDuration, format, endformat) => {
         // const format  = newdate.toISOString().slice(0,13);
         // newdate,format);
         const startTimeOfSlot = moment(a).add(i * slotDuration, 'minutes');
+        console.log(startTimeOfSlot)
         const endTimeOfSlot = moment(startTimeOfSlot).add(slotDuration, 'minutes');
-        if (endTimeOfSlot.format('hh:mm A') == endlastDate.format('hh:mm A')) {
-            return slots;
-        }
+        // if (endTimeOfSlot.format('hh:mm ') == endlastDate.format('hh:mm')) {
+        //     return slots;
+        // }
         // Add the slot to the slots array
         slots.push({
-            startTime: startTimeOfSlot.format('hh:mm A'),
-            endTime: endTimeOfSlot.format('hh:mm A')
+            startTime: startTimeOfSlot.format("HH:mm"),
+            endTime: endTimeOfSlot.format("HH:mm")
         });
     }
 

@@ -46,18 +46,21 @@ const createToken = async (req, res) => {
 
 }
 
-const getToken = async (req, res) => {
-    const { date, doctorid } = req.params
-    // const { date } = req.body;
-    const newdate = new Date(date);
+
+const getTokenData = async (req, res) => {
+    const { doctorid, date } = req.params;
+    const newDate = new Date(date)
+    if (!doctorid || !date) {
+        return res.send(error(400, "pls filled all field"));
+    }
     try {
         const data = await Tokens.findOne({
-            $and: [{ doctor_id: doctorid }, { date: newdate }],
+            $and: [{ doctor_id: doctorid }, { date: newDate }],
         });
         return res.send(success(200, data));
     } catch (e) {
-        return res.send(error(e.message));
+        return res.send(error(500, e.messege));
     }
 };
 
-export { createToken, getToken };
+export { createToken, getTokenData };
