@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 const AppointmentToken = new mongoose.Schema({
-    Doctorid: {
+    doctorid: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Doctor"
     },
@@ -8,19 +8,23 @@ const AppointmentToken = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "userpatient"
     },
+    hospitalid: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Master"
+    },
     name: {
         type: String,
         default: "name"
     },
-    Age: {
+    age: {
         type: Number,
         default: 9189214567
     },
-    Gender: {
+    gender: {
         type: String,
         default: "Gender"
     },
-    Mobile: {
+    phone: {
         type: Number,
         default: 9189214567
     },
@@ -28,24 +32,22 @@ const AppointmentToken = new mongoose.Schema({
         type: String,
         default: "Notes",
     },
-    AppointmentDate: {
+    appointmentDate: {
         type: Date,
+        default: Date.now
     },
-    token: {
+    tokenid: {
         type: String,
     },
-    // AppointmentTime:{
-    //     type:String,
-    // },
-    // isbookbytoken:{
-    //   type:String,
-    //   default:false
-    // },
+    tokenNo: {
+        type: Number,
+        required: true,
+    },
     status:
     {
         type: String,
         default: "pending"
     },
 })
-const AppointmentTokenModel = mongoose.model("Appointment", AppointmentToken);
+const AppointmentTokenModel = mongoose.model("AppointmentByToken", AppointmentToken);
 export { AppointmentTokenModel }

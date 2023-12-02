@@ -29,7 +29,7 @@ const editDoctorfile = async (req, res) => {
     location
   } = req.body
   const file = req.file
-
+  console.log("this is file", file)
 
   console.log("doctori profile", location)
 

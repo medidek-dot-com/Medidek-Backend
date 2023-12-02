@@ -6,7 +6,8 @@ import { requireUser } from '../Middleware/requireUser.js'
 import { requirePatient } from '../Middleware/requirePatient.js';
 // import { upload } from '../Multer/petientImgConfig.js';
 import multer from "multer";
-const upload = multer({ dest: "uploads/" });
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
 const userCreationRouter = express.Router();
 
 userCreationRouter.put('/changepassword/:id', requireUser, changepassword);

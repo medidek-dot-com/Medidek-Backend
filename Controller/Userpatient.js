@@ -12,6 +12,8 @@ import { cloud } from "./cloudinary/cloudinary.js"
 import { Doctor } from "../Models/AddDoctors.js";
 import { Master } from "../Models/Master.js";
 import crypto from "crypto";
+import { uploadFile } from "../Middleware/s3.js";
+
 
 
 const generateFileName = (bytes = 32) =>
@@ -438,10 +440,11 @@ const userprofileupdate = async (req, res) => {
         return res.send(error(409, "pls filled all field"));
     }
     const file = req.file;
-
+    console.log(file)
     const imageName = file ? generateFileName() : imgurl;
+    console.log("this is imageurl", imgurl)
     const fileBuffer = file?.buffer;
-
+    console.log("fileBuffer: " + fileBuffer)
     try {
         if (fileBuffer) {
             await uploadFile(fileBuffer, imageName, file.mimetype)
@@ -632,8 +635,11 @@ const changepassword = async (req, res) => {
         return res.send(error(500, e.message));
     }
 }
-
-
-
-export { UserCreation, getAllUser, FindbyUserNameAndPassoword, getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp, sendOtpForResetPassword, varifyOtpForResetPassword, ResetPassword, usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword, userprofileupdate }
+export {
+    UserCreation, getAllUser, FindbyUserNameAndPassoword,
+    getSinglePetient, updateUserpatientByyApp, updateUserpatientPasswordByyApp,
+    sendOtpForResetPassword, varifyOtpForResetPassword, ResetPassword,
+    usersignup, usersignin, userpasswordupdated, userforgotpassword,
+    isUserExist, usergetalldoctors, changepassword, userprofileupdate
+}
 

@@ -13,7 +13,6 @@ const createslot = async (req, res) => {
         isholiday,
         date,
         doctorid,
-        isOnlineSlot
     } = req.body;
     const newdate = new Date(date);
     console.log(req.body);
@@ -23,7 +22,7 @@ const createslot = async (req, res) => {
     try {
         const isslotalready = await Slots.findOne({ $and: [{ doctor_id: doctorid }, { date: newdate }] });
         if (isslotalready) {
-            const updatedslot = await Slots.findOneAndUpdate({ doctor_id: doctorid }, {
+            const updatedslot = await Slots.findOneAndUpdate({ $and: [{ doctor_id: doctorid }, { date: newdate }] }, {
                 slotduration,
                 Starttime1,
                 Endtime1,
@@ -34,7 +33,7 @@ const createslot = async (req, res) => {
                 isholiday,
                 date: newdate,
                 doctor_id: doctorid
-            })
+            }, { new: true })
             return res.send(success(200, { update: updatedslot }));
         }
         const createdslot = await Slots.create({

@@ -71,11 +71,9 @@ const getdoctorbytheirid = async (req, res) => {
   if (!doctorid && !hospitalId) {
     return res.send(error(409, { msg: "pls give doctorid and hospitalid" }));
   }
-
-
   // let hospitalId = "5349b4ddd2781d08c09890f3";
   try {
-    const isdoctoravailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId }] })
+    const isdoctoravailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId }, { status: "ACTIVE" }] })
     if (isdoctoravailableinhospital) {
       return res.send(error(403, "this doctor already available in your hospital"))
     }
@@ -126,44 +124,65 @@ const addDoctorbyhospital = async (req, res) => {
   ) {
     return res.send(error(401, "All fields are compulsory"));
   }
+  const imageName = file ? generateFileName() : imgurl;
+  const fileBuffer = file?.buffer;
+  if (fileBuffer) {
+    await uploadFile(fileBuffer, imageName, file.mimetype);
+  }
 
   try {
-    const isdoctoravailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId: hospitalid }] })
+    const isdoctoravailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId: hospitalid }, { status: "ACTIVE" }] })
     if (isdoctoravailableinhospital) {
       return res.send(error(500, { msg: "this doctor already available in your hospital" }))
     }
+    const isdoctorpreviouslyavailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId: hospitalid }, { status: "REMOVED" }] })
+    if (isdoctorpreviouslyavailableinhospital) {
+      const editDoctor = await Doctor.findOneAndUpdate(
+        { $and: [{ doctorid }, { hospitalId: hospitalid }, { status: "REMOVED" }] },
+        {
+          nameOfTheDoctor,
+          qulification,
+          speciality,
+          yearOfExprience,
+          email,
+          phone,
+          connsultationFee,
+          hospitalId: hospitalid,
+          doctorid,
+          img: imageName,
+          status: "ACTIVE",
+          category1,
+          category2,
+          category3,
+          category4,
+          description
+        },
+        { new: true }
+      );
 
-    const isdoctoravailable = await Doctor.findOne({ doctorid });
-    if (!isdoctoravailable) {
-      return res.send(error(500, { msg: "This doctorid does not exist" }));
+      editDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + editDoctor.img
+      return res.send(success(200, { editDoctor }));
     }
-    const imageName = file ? generateFileName() : imgurl;
-    const fileBuffer = file?.buffer;
-    if (fileBuffer) {
-      await uploadFile(fileBuffer, imageName, file.mimetype);
-    }
-    if (isdoctoravailable) {
-      const addDoctor = await Doctor.create({
-        nameOfTheDoctor,
-        qulification,
-        speciality,
-        yearOfExprience,
-        email,
-        phone,
-        connsultationFee,
-        hospitalId: hospitalid,
-        img: imageName,
-        doctorid,
-        category1,
-        category2,
-        category3,
-        category4,
-        description,
-        location
-      });
-      addDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + addDoctor.img
-      return res.send(success(200, { addDoctor }));
-    }
+    const addDoctor = await Doctor.create({
+      nameOfTheDoctor,
+      qulification,
+      speciality,
+      yearOfExprience,
+      email,
+      phone,
+      connsultationFee,
+      hospitalId: hospitalid,
+      img: imageName,
+      doctorid,
+      category1,
+      category2,
+      category3,
+      category4,
+      description,
+      location
+    });
+    addDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + addDoctor.img
+    return res.send(success(200, { addDoctor }));
 
   } catch (e) {
     res.send(error(500, e.message));
@@ -182,6 +201,15 @@ const getSingleDoctor = async (req, res) => {
     return res.send(error(500, e));
   }
 };
+
+
+
+
+
+
+
+
+
 
 const getSingleStaff = async (req, res) => {
   try {
@@ -305,6 +333,7 @@ const AddStaff = async (req, res) => {
       img: imageName,
     });
     result.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + result.img
+    await result.save();
     return res.send(success(201, result));
   } catch (e) {
     return res.send(error(500, e.message));
@@ -372,7 +401,7 @@ const alldoctorandstaffforhospital = async (req, res) => {
 const alldoctors = async (req, res) => {
   const { hospid } = req.params;
   try {
-    const alldoctors = await Doctor.find({ hospitalId: hospid });
+    const alldoctors = await Doctor.find({ hospitalId: hospid, status: "ACTIVE" });
     for (let doctor of alldoctors) {
       doctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + doctor.img
     }
@@ -384,6 +413,20 @@ const alldoctors = async (req, res) => {
   }
 };
 
+const statusupdatedoctortoremove = async (req, res) => {
+  const { doctorid } = req.params
+  const { status } = req.body;
+  if (!status || !doctorid) {
+    return res.send(error(400, "pls filled all fields"))
+  }
+  try {
+    const removedocotr = await Doctor.findByIdAndUpdate(doctorid, { status: status }, { new: true });
+    return res.send(success(200, "Dcotor removed succesfully"));
+  } catch (e) {
+    return res.send(error(500, e.message))
+  }
+}
+
 export {
   getSingleStaff,
   hospitalprofileupdate,
@@ -394,5 +437,6 @@ export {
   editStaff,
   alldoctorandstaffforhospital,
   getSingleDoctor,
-  alldoctors
+  alldoctors,
+  statusupdatedoctortoremove
 };

@@ -1,4 +1,5 @@
 import { Tokens } from "../Models/Token.js";
+import { AppointmentTokenModel } from "../Models/tokencreate.js";
 import { success, error } from "../Utils/responseWrapper.js";
 const createToken = async (req, res) => {
     const { // doctorid should be database id of doctor
@@ -17,7 +18,7 @@ const createToken = async (req, res) => {
     try {
         const isslotalready = await Tokens.findOne({ $and: [{ doctor_id: doctorid }, { date: newdate }] });
         if (isslotalready) {
-            const updatedslot = await Tokens.findOneAndUpdate({ doctor_id: doctorid }, {
+            const updatedslot = await Tokens.findOneAndUpdate({ $and: [{ doctor_id: doctorid }, { date: newdate }] }, {
                 Starttime1,
                 Endtime1,
                 Starttime2,
@@ -26,7 +27,9 @@ const createToken = async (req, res) => {
                 Endtime3,
                 date: newdate,
                 doctor_id: doctorid
-            })
+            }, { new: true })
+
+
             return res.send(success(200, { update: updatedslot }));
         }
         const createdslot = await Tokens.create({
@@ -63,4 +66,65 @@ const getTokenData = async (req, res) => {
     }
 };
 
-export { createToken, getTokenData };
+const bookappointmentbytoken = async (req, res) => {
+    const {
+        doctorid,
+        userid,
+        name,
+        age,
+        gender,
+        phone,
+        AppointmentNotes,
+        role
+    } = req.body;
+    const today = new Date();
+    const lastAppointment = await AppointmentTokenModel.
+        findOne({ doctorid, appointmentDate: { $gte: new Date(Date.now() - 86400000) } })
+        .sort({ tokenNo: -1 });
+    let nextTokenNo = lastAppointment ? lastAppointment.tokenNo + 1 : 1;
+    if (role === "MASTER") {
+        const newToken = await AppointmentTokenModel.create({
+            doctorid,
+            hospitalid: userid,
+            name,
+            age,
+            gender,
+            phone,
+            AppointmentNotes,
+            appointmentDate: today,
+            tokenid: Math.random().toString(36).substring(7),
+            tokenNo: nextTokenNo,
+        });
+        return res.send(success(201,
+            newToken));
+    }
+    const existingToken = await AppointmentTokenModel.findOne({
+        doctorid,
+        userid,
+        appointmentDate: { $gte: new Date(Date.now() - 86400000) },
+    });
+    if (existingToken) {
+        // The doctor has already created a token for the patient for the current day.
+        return res.send(error(409, "token already exist for this user and doctor for today"
+        ));
+    }
+
+    // Create a new token
+    const newToken = await AppointmentTokenModel.create({
+        doctorid,
+        userid,
+        name,
+        age,
+        gender,
+        phone,
+        AppointmentNotes,
+        appointmentDate: today,
+        tokenid: Math.random().toString(36).substring(7),
+        tokenNo: nextTokenNo,
+    });
+    return res.send(success(201,
+        newToken));
+}
+
+
+export { createToken, getTokenData, bookappointmentbytoken };
