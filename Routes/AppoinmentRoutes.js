@@ -2,7 +2,7 @@ import express from 'express'
 import { getAppoinmentForDoctorInHospital, AppointmentCreation, Instantbooking, getAppointmentForPatient, updateAppointment, getCancelAppointmentForPatient, updateUserAppointmentStatus, getPendingAppointmentsForHospitalAndDoctors, getCompleteAppointmentsForHospitalAndDoctors, getAllAppointmentsForPerticularHospital, getPendingAppointmentsForHospital, getCompleteAppointmentsForHospital, getMissedAppointmentsForHospital, getCompletedAppointmentForPatient, createAppointmentByHospitals, getPendingAppointmentForPatient, getMissedAppointmentsForHospitalAndDoctors } from '../Controller/UserAppointment.js';
 import { requireUser } from '../Middleware/requireUser.js';
 import { requirePatient } from '../Middleware/requirePatient.js';
-import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser, getallappointmentofdoctor, getAllPendingAppointmentOfDoctor, getAllCompletedAppointmentOfDoctor, getAllMissedAppointmentOfDoctor, changeappointmentstatus, getsingleappointmentbyid, Appointmentstatusinpercentage, TodayAppointment, Totalapatient, Futureappointment, getallappointmentsforparticularhospitalidpending, getallappointmentsforparticularhospitalidcompleted, getallappointmentsforparticularhospitalidmissed } from '../Controller/Appointment.js';
+import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser, getallappointmentofdoctor, getAllPendingAppointmentOfDoctor, getAllCompletedAppointmentOfDoctor, getAllMissedAppointmentOfDoctor, changeappointmentstatus, getsingleappointmentbyid, Appointmentstatusinpercentage, TodayAppointment, Totalapatient, Futureappointment, getallappointmentsforparticularhospitalidpending, getallappointmentsforparticularhospitalidcompleted, getallappointmentsforparticularhospitalidmissed, getAllPendingAppointmentByTokenOfDoctor, getAllCompletedAppointmentByTokenOfDoctor, getAllMissedAppointmentByTokenOfDoctor, changeappointmentstatusForAppointmentByToken, TodayAppointmentByToken, AppointmentstatusinpercentageForAppointmentByToken, FutureappointmentForAppointmentByToken } from '../Controller/Appointment.js';
 const Appointment = express.Router();
 
 
@@ -33,11 +33,20 @@ Appointment.get('/getMissedAppointmentsForHospital/:hospitalid/:date',
 // Get All pending Appointments for Doctor
 Appointment.get('/getPendingAppoinmentForDoctor/:doctorid/:date', requireUser, getAllPendingAppointmentOfDoctor)
 
-// Get All pending Appointments for Doctor
+// Get All completed Appointments for Doctor
 Appointment.get('/getCompletedAppoinmentForDoctor/:doctorid/:date', requireUser, getAllCompletedAppointmentOfDoctor)
 
 // Get All Missed Appointments for Doctor
 Appointment.get('/getMissedAppoinmentForDoctor/:doctorid/:date', requireUser, getAllMissedAppointmentOfDoctor)
+
+// Get All pending Appointments By Token for Doctor
+Appointment.get('/getPendingAppoinmentByTokenForDoctor/:doctorid/:date', requireUser, getAllPendingAppointmentByTokenOfDoctor)
+
+// Get All completed Appointments By Token for Doctor
+Appointment.get('/getCompletedAppoinmentByTokenForDoctor/:doctorid/:date', requireUser, getAllCompletedAppointmentByTokenOfDoctor)
+
+// Get All Missed Appointments By Token for Doctor
+Appointment.get('/getMissedAppoinmentByTokenForDoctor/:doctorid/:date', requireUser, getAllMissedAppointmentByTokenOfDoctor)
 
 
 //(To here)
@@ -45,14 +54,21 @@ Appointment.get('/getMissedAppoinmentForDoctor/:doctorid/:date', requireUser, ge
 // Pi chart Api rout here
 Appointment.get('/getPiChartData/:doctorid/:date/piChart', requireUser, Appointmentstatusinpercentage)
 
+Appointment.get('/getPiChartDataForAppointmentByToken/:doctorid/:date/piChart', requireUser, AppointmentstatusinpercentageForAppointmentByToken)
+
 //Today's Appointments Route
 Appointment.get('/todaysAppointement/:doctorid/:date/:todaysAppointment', requireUser, TodayAppointment)
+
+
+Appointment.get('/todaysAppointementByToken/:doctorid/:date/:todaysAppointment', requireUser, TodayAppointmentByToken)
 
 //Total petient Route
 Appointment.get('/totalPatient/:doctorid/:date/totalPatient', requireUser, Totalapatient)
 
 //Future Appointments Route
 Appointment.get('/futureAppointment/:doctorid/futureAppointment', requireUser, Futureappointment)
+
+Appointment.get('/futureAppointmentForAppointmentByToken/:doctorid/futureAppointment', requireUser, FutureappointmentForAppointmentByToken)
 
 
 Appointment.get('/getPendingAppointmentsForHospital/:hosep_id', requireUser, getPendingAppointmentsForHospital)
@@ -101,6 +117,9 @@ Appointment.get("/getsingleappointmentbyid/:appointmentId/:status", requireUser,
 Appointment.put("/updateUserAppointment/:id", requireUser, updateAppointment)
 
 Appointment.put('/updateUserAppointmentStatus/:id', requireUser, changeappointmentstatus)
+
+
+Appointment.put('/updateAppointmentByTokenUserAppointmentStatus/:id', requireUser, changeappointmentstatusForAppointmentByToken)
 
 
 Appointment.get("/getCancelAppointment/:Patient_id", requireUser, getCancelAppointmentForPatient)
