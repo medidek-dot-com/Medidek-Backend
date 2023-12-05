@@ -34,7 +34,7 @@ const MasterShema = new mongoose.Schema({
     },
     img: {
         type: String,
-        default: "76f4617430e7b5acdffae2580adbd8b1f1fd12ca15e09d261915f6e5c6b7a115",
+        default: "67c30e16c91a42ff9f30f84959a0ce1be155b24d8bbe14583d51cbfcc430fdba",
     },
     category1: {
         type: String,
