@@ -48,6 +48,7 @@ const AppointmentToken = new mongoose.Schema({
         type: String,
         default: "pending"
     },
+
 })
 const AppointmentTokenModel = mongoose.model("AppointmentByToken", AppointmentToken);
 export { AppointmentTokenModel }
