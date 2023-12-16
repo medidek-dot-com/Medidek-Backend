@@ -2,7 +2,7 @@ import express from 'express'
 import { getAppoinmentForDoctorInHospital, AppointmentCreation, Instantbooking, getAppointmentForPatient, updateAppointment, getCancelAppointmentForPatient, updateUserAppointmentStatus, getPendingAppointmentsForHospitalAndDoctors, getCompleteAppointmentsForHospitalAndDoctors, getAllAppointmentsForPerticularHospital, getPendingAppointmentsForHospital, getCompleteAppointmentsForHospital, getMissedAppointmentsForHospital, getCompletedAppointmentForPatient, createAppointmentByHospitals, getPendingAppointmentForPatient, getMissedAppointmentsForHospitalAndDoctors } from '../Controller/UserAppointment.js';
 import { requireUser } from '../Middleware/requireUser.js';
 import { requirePatient } from '../Middleware/requirePatient.js';
-import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser, getallappointmentofdoctor, getAllPendingAppointmentOfDoctor, getAllCompletedAppointmentOfDoctor, getAllMissedAppointmentOfDoctor, changeappointmentstatus, getsingleappointmentbyid, Appointmentstatusinpercentage, TodayAppointment, Totalapatient, Futureappointment, getallappointmentsforparticularhospitalidpending, getallappointmentsforparticularhospitalidcompleted, getallappointmentsforparticularhospitalidmissed, getAllPendingAppointmentByTokenOfDoctor, getAllCompletedAppointmentByTokenOfDoctor, getAllMissedAppointmentByTokenOfDoctor, changeappointmentstatusForAppointmentByToken, TodayAppointmentByToken, AppointmentstatusinpercentageForAppointmentByToken, FutureappointmentForAppointmentByToken } from '../Controller/Appointment.js';
+import { getUpcomingAppointmentForAnUser, getCompletedAppointmentsForAnUser, getMissedAppointmentsForAnUser, getallappointmentofdoctor, getAllPendingAppointmentOfDoctor, getAllCompletedAppointmentOfDoctor, getAllMissedAppointmentOfDoctor, changeappointmentstatus, getsingleappointmentbyid, Appointmentstatusinpercentage, TodayAppointment, Totalapatient, Futureappointment, getallappointmentsforparticularhospitalidpending, getallappointmentsforparticularhospitalidcompleted, getallappointmentsforparticularhospitalidmissed, getAllPendingAppointmentByTokenOfDoctor, getAllCompletedAppointmentByTokenOfDoctor, getAllMissedAppointmentByTokenOfDoctor, changeappointmentstatusForAppointmentByToken, TodayAppointmentByToken, AppointmentstatusinpercentageForAppointmentByToken, FutureappointmentForAppointmentByToken, getallappointmentsByTokenforparticularhospitalidpending, getallappointmentsByTokenforparticularhospitalidcompleted, getallappointmentsByTokenforparticularhospitalidmissed } from '../Controller/Appointment.js';
 const Appointment = express.Router();
 
 
@@ -12,12 +12,19 @@ const Appointment = express.Router();
 
 
 Appointment.get('/getAllAppointmentsForPerticularHospital/:hospitalid/:date', getallappointmentsforparticularhospitalidpending)
+Appointment.get('/getAllAppointmentsForPerticularHospitalByToken/:hospitalid/:date/pendingByToken', getallappointmentsByTokenforparticularhospitalidpending)
 
 Appointment.get('/getCompleteAppointmentsForHospital/:hospitalid/:date', getallappointmentsforparticularhospitalidcompleted)
 
 
+Appointment.get('/getCompleteAppointmentsForHospitalByToken/:hospitalid/:date/completedByToken', getallappointmentsByTokenforparticularhospitalidcompleted)
+
+
 Appointment.get('/getMissedAppointmentsForHospital/:hospitalid/:date',
     getallappointmentsforparticularhospitalidmissed)
+
+Appointment.get('/getMissedAppointmentsByTokenForHospital/:hospitalid/:date/missedByToken',
+    getallappointmentsByTokenforparticularhospitalidmissed)
 
 
 
@@ -117,6 +124,7 @@ Appointment.get("/getsingleappointmentbyid/:appointmentId/:status", requireUser,
 Appointment.put("/updateUserAppointment/:id", requireUser, updateAppointment)
 
 Appointment.put('/updateUserAppointmentStatus/:id', requireUser, changeappointmentstatus)
+
 
 
 Appointment.put('/updateAppointmentByTokenUserAppointmentStatus/:id', requireUser, changeappointmentstatusForAppointmentByToken)

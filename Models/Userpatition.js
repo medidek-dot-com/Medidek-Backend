@@ -11,18 +11,18 @@ const MasterShema = new mongoose.Schema({
         default: "6d27d5a62d61ead2a0084c78fb31307afd5fed6e9e42c49feb9efdbf03423061",
     },
     password: { type: String },
-    createdDate: { type: Date, default: Date.now() },
+    createddate: { type: Date, default: new Date() },
     location: { type: String, default: "Nagpur" },
     role: { type: String, default: "PATIENT" },
     imgurl: {
         type: String,
-        default: "url"
+        default: "https://d26dtlo3dcke63.cloudfront.net/67c30e16c91a42ff9f30f84959a0ce1be155b24d8bbe14583d51cbfcc430fdba"
     },
     gender: { type: String },
     medicalRecord: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MedicalRecord' }]
 
 
-})
+}, { timestamps: true })
 const userpatient = mongoose.model("userpatient", MasterShema)
 export { userpatient }
 

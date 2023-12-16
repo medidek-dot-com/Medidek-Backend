@@ -16,9 +16,12 @@ import { course } from './Routes/CourseRouter.js'
 import { notifyMe } from './Routes/notifyMeRoute.js'
 import { Record } from './Routes/RecordRoute.js'
 import { review } from './Routes/ReviewRoute.js'
-import { router } from "./Controller/cloudinaryController.js"
 import { slotRouter } from './Routes/slotRoute.js'
 import { TokenRouter } from './Routes/Tokenroute.js'
+import { adminauthRouter } from './Routes/Adminauthroute.js'
+import { adminRoiuter } from './Routes/Adminroute.js'
+import { adminmasterRouter } from './Routes/Adminmaster.js'
+import { admindoctorRouter } from './Routes/Admindoctorroute.js'
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -34,7 +37,10 @@ app.use(cookieParser());
 app.use('/uploads', express.static('./uploads'))
 
 //Routes
-
+app.use("/v2", adminRoiuter)
+app.use("/v2", admindoctorRouter)
+app.use("/v2", adminmasterRouter)
+app.use("/v2", adminauthRouter)
 app.use('/v2', authRouter)
 app.use("/v2", masterRouter)
 app.use("/v2", Router)
@@ -47,7 +53,6 @@ app.use("/v2", course)
 app.use("/v2", notifyMe)
 app.use("/v2", Record)
 app.use("/v2", review)
-app.use("/v2", router)
 app.use("/v2", slotRouter)
 app.use("/v2", TokenRouter)
 

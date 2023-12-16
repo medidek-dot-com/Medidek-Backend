@@ -61,7 +61,7 @@ const MasterShema = new mongoose.Schema({
         required: true,
         default: "description"
     },
-    createddate: { type: Date, default: Date.now() },
+    createddate: { type: Date, default: new Date() },
     status: { type: String, default: 'ACTIVE' },
     role: { type: String, default: "DOCTOR" },
     reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
@@ -71,19 +71,16 @@ const MasterShema = new mongoose.Schema({
     },
     imgurl: {
         type: String,
-        default: "url"
+        default: "https://d26dtlo3dcke63.cloudfront.net/67c30e16c91a42ff9f30f84959a0ce1be155b24d8bbe14583d51cbfcc430fdba"
     },
     acceptAppointments: {
         type: String,
         required: true,
         default: "byToken"
     },
-    // acceptAppointmentByToken: {
-    //     type: Boolean,
-    //     default: false
-    // },
-
-})
+    landmark: { type: String },
+    enterFullAddress: { type: String },
+}, { timestamps: true })
 
 const Doctor = mongoose.model("Doctor", MasterShema)
 

@@ -50,8 +50,9 @@ const AppointmentToken = new mongoose.Schema({
     },
     remark: {
         type: String,
-    }
+    },
+    createddate: { type: Date, default: new Date() },
 
-})
+}, { timestamps: true })
 const AppointmentTokenModel = mongoose.model("AppointmentByToken", AppointmentToken);
 export { AppointmentTokenModel }

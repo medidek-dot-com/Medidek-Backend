@@ -45,7 +45,9 @@ const SlotSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-},)
+    createddate: { type: Date, default: new Date() },
+
+}, { timestamps: true })
 
 const Slots = mongoose.model("AppointmentSlot", SlotSchema);
 export { Slots };

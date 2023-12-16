@@ -8,7 +8,6 @@ import { Otp } from "../Models/otpSchema.js";
 import { error, success } from "../Utils/responseWrapper.js";
 import { genrateAccessToken, genrateRefreshToken, sendOTPToEmail } from "./authController.js";
 import bcrypt from 'bcrypt'
-import { cloud } from "./cloudinary/cloudinary.js"
 import { Doctor } from "../Models/AddDoctors.js";
 import { Master } from "../Models/Master.js";
 import crypto from "crypto";

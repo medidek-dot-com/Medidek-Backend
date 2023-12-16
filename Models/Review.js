@@ -12,8 +12,9 @@ const MasterShema = new mongoose.Schema({
     rating: { type: Number },
     message: { type: String },
     // connsultationFee:{type:String}, 
-    createddate: { type: Date, default: Date.now() }
-})
+    createddate: { type: Date, default: new Date() },
+
+}, { timestamps: true })
 
 const Review = mongoose.model("Review", MasterShema)
 

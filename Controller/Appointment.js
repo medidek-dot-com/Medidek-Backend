@@ -125,6 +125,53 @@ const updateAppointmnt = async (req, res) => {
     }
 }
 
+
+const updateAppointmntForAppointmentByToken = async (req, res) => {
+    const { appointmentId } = req.params;
+    const {
+        doctorid,
+        userid,
+        name,
+        age,
+        gender,
+        phone,
+        AppointmentNotes,
+        appointmentDate,
+        status
+    } = req.body;
+
+    if (
+        !doctorid ||
+        !userid ||
+        !name ||
+        !age ||
+        !gender ||
+        !phone ||
+        !appointmentDate ||
+        !AppointmentNotes ||
+        !status) {
+        return res.send(error(400, "all fields  required"));
+    }
+
+
+    try {
+        const appointmentupdated = await AppointmentTokenModel.findByIdAndUpdate({ _id: appointmentId }, {
+            doctorid,
+            userid,
+            name,
+            age,
+            gender,
+            phone,
+            AppointmentNotes,
+            appointmentDate,
+            status,
+        }, { new: true });
+        return res.send(success(200, appointmentupdated));
+    } catch (e) {
+        return res.send(error(e.message));
+    }
+}
+
 const appointmentstatus = async (req, res) => {
     const { userid, status } = req.body;
     try {
@@ -451,6 +498,21 @@ const getallappointmentsforparticularhospitalidpending = async (req, res) => {
         return res.send(error(500, e.message))
     }
 }
+const getallappointmentsByTokenforparticularhospitalidpending = async (req, res) => {
+    const { hospitalid, date } = req.params;
+    const newdate = new Date(date)
+    if (!hospitalid) {
+        return res.send(error(404, "filed missing required parameter"))
+    }
+    try {
+        const allappointment = await AppointmentTokenModel.find({
+            $and: [{ hospitalid }, { status: "pending" }, { appointmentDate: newdate }]
+        }).populate("doctorid")
+        return res.send(success(200, allappointment))
+    } catch (e) {
+        return res.send(error(500, e.message))
+    }
+}
 const getallappointmentsforparticularhospitalidcompleted = async (req, res) => {
     const { hospitalid, date } = req.params;
     const newdate = new Date(date)
@@ -466,6 +528,22 @@ const getallappointmentsforparticularhospitalidcompleted = async (req, res) => {
         return res.send(error(500, e.message))
     }
 }
+
+const getallappointmentsByTokenforparticularhospitalidcompleted = async (req, res) => {
+    const { hospitalid, date } = req.params;
+    const newdate = new Date(date)
+    if (!hospitalid) {
+        return res.send(error(404, "filed missing required parameter"))
+    }
+    try {
+        const allappointment = await AppointmentTokenModel.find({
+            $and: [{ hospitalid }, { status: "completed" }, { appointmentDate: newdate }]
+        }).populate("doctorid")
+        return res.send(success(200, allappointment))
+    } catch (e) {
+        return res.send(error(500, e.message))
+    }
+}
 const getallappointmentsforparticularhospitalidmissed = async (req, res) => {
     const { hospitalid, date } = req.params;
     const newdate = new Date(date)
@@ -474,6 +552,22 @@ const getallappointmentsforparticularhospitalidmissed = async (req, res) => {
     }
     try {
         const allappointment = await AppointmentModel.find({
+            $and: [{ hospitalid }, { status: "missed" }, { appointmentDate: newdate }]
+        }).populate("doctorid")
+        return res.send(success(200, allappointment))
+    } catch (e) {
+        return res.send(error(500, e.message))
+    }
+}
+
+const getallappointmentsByTokenforparticularhospitalidmissed = async (req, res) => {
+    const { hospitalid, date } = req.params;
+    const newdate = new Date(date)
+    if (!hospitalid) {
+        return res.send(error(404, "filed missing required parameter"))
+    }
+    try {
+        const allappointment = await AppointmentTokenModel.find({
             $and: [{ hospitalid }, { status: "missed" }, { appointmentDate: newdate }]
         }).populate("doctorid")
         return res.send(success(200, allappointment))
@@ -653,8 +747,11 @@ const appointmentstatusfordoctor = async (req, res) => {
 
 export {
     getallappointmentsforparticularhospitalidmissed,
+    getallappointmentsByTokenforparticularhospitalidmissed,
     getallappointmentsforparticularhospitalidcompleted,
+    getallappointmentsByTokenforparticularhospitalidcompleted,
     getallappointmentsforparticularhospitalidpending,
+    getallappointmentsByTokenforparticularhospitalidpending,
     createAppointmnt,
     getAllPendingAppointmentOfDoctor,
     getAllCompletedAppointmentOfDoctor,
@@ -679,5 +776,6 @@ export {
     getCompletedAppointmentsForAnUser,
     getMissedAppointmentsForAnUser,
     getsingleappointmentbyid,
-    updateAppointmnt
+    updateAppointmnt,
+    updateAppointmntForAppointmentByToken
 }

@@ -5,8 +5,8 @@ const MasterShema = new mongoose.Schema({
     phone: { type: String, },
     email: { type: String },
     message: { type: String },
-    // connsultationFee:{type:String}, 
-})
+    createddate: { type: Date, default: new Date() },
+}, { timestamps: true })
 
 const contact = mongoose.model("contact", MasterShema)
 

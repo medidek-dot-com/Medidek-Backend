@@ -37,7 +37,8 @@ const TokenSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
-},)
+    createddate: { type: Date, default: new Date() },
+}, { timestamps: true })
 
 const Tokens = mongoose.model("AppointmentToken", TokenSchema);
 export { Tokens };

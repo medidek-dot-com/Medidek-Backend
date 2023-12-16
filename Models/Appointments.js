@@ -38,10 +38,6 @@ const Appointment = new mongoose.Schema({
     AppointmentTime: {
         type: String,
     },
-    // isbookbytoken:{
-    //   type:Boolean,
-    //   default:false
-    // },
     status:
     {
         type: String,
@@ -49,8 +45,10 @@ const Appointment = new mongoose.Schema({
     },
     remark: {
         type: String,
-    }
-})
+    },
+    createddate: { type: Date, default: new Date() },
+
+}, { timestamps: true })
 
 const AppointmentModel = mongoose.model("Appointment", Appointment);
 export { AppointmentModel }

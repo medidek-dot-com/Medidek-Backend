@@ -1,16 +1,15 @@
 
 import mongoose from "mongoose";
-const MasterShema =new mongoose.Schema({
-    medicalImg :{type:String },
-    name:{type:String},
-    medicalRecordName:{type:String},
-    // connsultationFee:{type:String}, 
-    createdDate:{type:Date, default: Date.now()},
-})
+const MasterShema = new mongoose.Schema({
+    medicalImg: { type: String },
+    name: { type: String },
+    medicalRecordName: { type: String },
+    createddate: { type: Date, default: new Date() },
+}, { timestamps: true })
 
-const MedicalRecord= mongoose.model("MedicalRecord",MasterShema)
+const MedicalRecord = mongoose.model("MedicalRecord", MasterShema)
 
-export {MedicalRecord}
+export { MedicalRecord }
 
 
 
