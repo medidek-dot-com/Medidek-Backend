@@ -193,7 +193,6 @@ const getSingleDoctor = async (req, res) => {
   try {
     let result = await Doctor.findById(req.params.id).populate("reviews");
     await result.populate("reviews.userid");
-    console.log(result);
     result.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + result.img
 
     res.send(success(201, result));
@@ -302,7 +301,6 @@ const AddStaff = async (req, res) => {
     gender,
     // dob,
   } = req.body;
-  console.log(req.body);
   if (
     !nameOfStaff ||
     !designation ||
@@ -405,8 +403,6 @@ const alldoctors = async (req, res) => {
     for (let doctor of alldoctors) {
       doctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + doctor.img
     }
-    // alldoctors.imgurl = await getObjectSignedUrl(alldoctors.img);
-    // allstaffs.imgurl = await getObjectSignedUrl(allstaffs.img);
     return res.send(success(200, alldoctors));
   } catch (e) {
     res.send(error(e.message));

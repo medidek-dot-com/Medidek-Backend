@@ -112,7 +112,6 @@ const bookappointmentbytoken = async (req, res) => {
         appointmentDate: { $gte: today },
         status: "pending"
     });
-    console.log(existingToken)
     if (existingToken) {
         // The doctor has already created a token for the patient for the current day.
         return res.send(error(409, "token already exist for this user and doctor for today"

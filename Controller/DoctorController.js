@@ -29,9 +29,6 @@ const editDoctorfile = async (req, res) => {
     location
   } = req.body
   const file = req.file
-  console.log("this is file", file)
-
-  console.log("doctori profile", location)
 
 
   if (!nameOfTheDoctor || !qulification || !speciality
@@ -65,7 +62,6 @@ const editDoctorfile = async (req, res) => {
     }, { new: true });
     data.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + data.img
     await data.save();
-    console.log("request coming from db");
     res.send(success(200, data));
 
   } catch (e) {

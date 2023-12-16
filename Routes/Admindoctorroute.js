@@ -1,9 +1,9 @@
 import express from 'express';
-import { requireAdmin } from '../Middleware/requireAdmin.js';
 import { addDoctor, getAllDoctors } from '../Controller/Admindoctor.js';
 import multer from "multer";
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
+
 
 const admindoctorRouter = express.Router();
 

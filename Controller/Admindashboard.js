@@ -94,7 +94,6 @@ const totalAppointmentChartData = async (req, res) => {
     try {
         const startDate = new Date(weekStartDate);
         const endDate = new Date(weekEndDate);
-        console.log(startDate);
 
         const dataFromCollection1 = await AppointmentModel.find({
             createddate: { $gte: startDate, $lt: endDate }
@@ -103,14 +102,12 @@ const totalAppointmentChartData = async (req, res) => {
         const combinedDataPerDay = {};
         for (let i = 0; i < 7; i++) {
             const currentDay = moment(startDate).add(i, 'days').format('YYYY-MM-DDThh:mm:ss');
-            console.log("current day", currentDay);
             combinedDataPerDay[currentDay] = {
                 collection1Data: dataFromCollection1.filter(item => item.createddate === currentDay),
                 collection2Data: dataFromCollection2.filter(item => item.createddate === currentDay),
 
             }
         }
-        console.log("coll 1", dataFromCollection1, "coll 2", dataFromCollection2);
         return res.send(success(200, combinedDataPerDay))
     } catch (e) {
         return res.send(error(500, e.message))

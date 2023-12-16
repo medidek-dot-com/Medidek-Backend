@@ -15,7 +15,6 @@ const createslot = async (req, res) => {
         doctorid,
     } = req.body;
     const newdate = new Date(date);
-    console.log(req.body);
     if (!doctorid || !date) {
         return res.send(error(400, "all fields are required"))
     }
@@ -202,20 +201,9 @@ const genrateSlots = (startTime, endTime, slotDuration) => {
         const originalDate = moment(start);
         const modifiedDate = originalDate.set({ hour: parseInt(startTime), minute: 0, second: 0 });
         const a = modifiedDate.format()
-        // // const newdate = new Date(a);
-        // // newdate);
-        // // const fom = newdate.setMinutes(0)
-        // // const fom2 = newdate.setSeconds(0)
-        // // const fom3 = newdate.setMilliseconds(0);
-        // const format  = newdate.toISOString().slice(0,13);
-        // newdate,format);
+
         const startTimeOfSlot = moment(a).add(i * slotDuration, 'minutes');
-        console.log(startTimeOfSlot)
         const endTimeOfSlot = moment(startTimeOfSlot).add(slotDuration, 'minutes');
-        // if (endTimeOfSlot.format('hh:mm ') == endlastDate.format('hh:mm')) {
-        //     return slots;
-        // }
-        // Add the slot to the slots array
         slots.push({
             startTime: startTimeOfSlot.format("HH:mm"),
             endTime: endTimeOfSlot.format("HH:mm")

@@ -11,8 +11,6 @@ export const ReviewCreation = async (req, res) => {
     }
     try {
 
-        // Create a new Review document
-        console.log("new review created");
         const newReview = await Review.create(
             {
                 doctorid,

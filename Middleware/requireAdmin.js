@@ -19,7 +19,6 @@ export const requireAdmin = async (req, res, next) => {
         }
         next();
     } catch (e) {
-        console.log(e);
         // return res.status(401).send('Invalid access key');
         res.send(error(401, 'Invalid access key'));
     }

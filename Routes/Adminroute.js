@@ -8,6 +8,5 @@ adminRoiuter.get('/getAllDashboardCardsData', requireAdmin, getAllDashboardCards
 adminRoiuter.get('/totalAppointmentChartData/:weekStartDate/:weekEndDate', totalAppointmentChartData)
 adminRoiuter.get('/latestAppointments', requireAdmin, latestAppointments)
 adminRoiuter.get('/latestPatientsUser', requireAdmin, newlySignUpPatient)
-// adminRoiuter.get('/getHospitalsFigure', requireAdmin, getAllHospitalsFigure)
 
 export { adminRoiuter }

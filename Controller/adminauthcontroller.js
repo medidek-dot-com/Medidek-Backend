@@ -85,7 +85,6 @@ const refreshAccessTokenController = async (req, res) => {
     }
 
     const refreshToken = cookies.jwt
-    console.log('Refreshhhh', refreshToken);
 
     try {
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
@@ -96,7 +95,6 @@ const refreshAccessTokenController = async (req, res) => {
         return res.send(success(201, { accessToken }));
 
     } catch (e) {
-        console.log(e);
         // return res.status(401).send('Invalid refresh token');
         return res.send(error(401, 'Invalid refresh token'));
     }
@@ -109,7 +107,7 @@ export const genrateAccessToken = (data) => {
         const token = jwt.sign(data, process.env.ACCESS_TOKEN_PRIVATE_KEY, { expiresIn: "1d" });
         return token
     } catch (e) {
-        console.log(e.message);
+        return res.send(error(401, e.message))
     }
 }
 
@@ -118,8 +116,8 @@ export const genrateRefreshToken = (data) => {
     try {
         const token = jwt.sign(data, process.env.REFRESH_TOKEN_PRIVATE_KEY, { expiresIn: "1y" });
         return token
-    } catch (error) {
-        console.log(error);
+    } catch (e) {
+        return res.send(error(401, e.message))
     }
 }
 

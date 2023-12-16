@@ -23,38 +23,6 @@ const ses = new AWS.SES()
 
 
 
-// export const signupController = async (req, res) => {
-//     try {
-//         const { email, password } = req.body;
-
-//         console.log(req.body);
-//         if (!email || !password) {
-//             // return res.status(400).send("All fields are required");
-//             return res.send(error(400, "All fields are required"));
-//         }
-
-//         const oldUser = await User.findOne({ email })
-
-//         if (oldUser) {
-//             // return res.status(400).send("User is already registered");
-//             return res.send(error(409, "User is already registered"))
-//         }
-
-//         const hashedPassword = await bcrypt.hash(password, 10)
-
-
-
-//         const user = await User.create({ email, password: hashedPassword })
-
-//         // return res.status(201).json({ user })
-//         return res.send(success(201, { user }))
-
-//     } catch (e) {
-//         // res.status(401).send(error)
-//         console.log(e);
-//         return res.send(error(401, e))
-//     }
-// };
 
 export const sendOtpController = async (req, res) => {
 
@@ -92,7 +60,6 @@ export const sendOtpController = async (req, res) => {
 
         }
     } catch (e) {
-        console.log(e);
         return res.send(error(400, "Something went wrong"));
 
     }
@@ -108,8 +75,8 @@ export const varifyOtpAndSignUpController = async (req, res) => {
         const otpverification = await Otp.findOne({ email: email });
 
         if (otpverification.otp !== otp) {
-           return res.send(error(403, "Invalid OTP"))
-            
+            return res.send(error(403, "Invalid OTP"))
+
         }
         const hashedPassword = await bcrypt.hash(password, 10)
 
@@ -119,7 +86,7 @@ export const varifyOtpAndSignUpController = async (req, res) => {
         return res.send(success(201, { user }))
 
     } catch (e) {
-        console.log(e);
+        return res.send(error(401, e.message))
     }
 };
 export const sendOTPToEmail = async (email, otp) => {
@@ -149,7 +116,7 @@ export const sendOTPToEmail = async (email, otp) => {
 
     try {
         const result = await ses.sendEmail(params).promise();
-     return result
+        return result
     } catch (error) {
         console.error('Error sending OTP email:', error);
     }
@@ -198,17 +165,17 @@ export const signinController = async (req, res) => {
 
 
     } catch (e) {
-       return res.send(error(500, e.message));
+        return res.send(error(500, e.message));
     }
 };
 
-export const logoutController =(req, res)=>{
+export const logoutController = (req, res) => {
     try {
         res.clearCookie('jwt', {
             httpOnly: true,
             secure: true,
         })
-        return  res.send(success(200, 'User logged out'))
+        return res.send(success(200, 'User logged out'))
     } catch (e) {
         return res.send(error(500, e.message))
     }
@@ -223,19 +190,15 @@ export const refreshAccessTokenController = async (req, res) => {
     }
 
     const refreshToken = cookies.jwt
-    console.log('Refreshhhh', refreshToken);
 
     try {
         const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_PRIVATE_KEY);
         const _id = decoded._id;
         const accessToken = genrateAccessToken({ _id });
 
-        //    return res.status(201).json({accessToken})
         return res.send(success(201, { accessToken }));
 
     } catch (e) {
-        console.log(e);
-        // return res.status(401).send('Invalid refresh token');
         return res.send(error(401, 'Invalid refresh token'));
     }
 
@@ -245,20 +208,18 @@ export const refreshAccessTokenController = async (req, res) => {
 export const genrateAccessToken = (data) => {
     try {
         const token = jwt.sign(data, process.env.ACCESS_TOKEN_PRIVATE_KEY, { expiresIn: "1d" });
-        console.log("access token",token);
         return token
     } catch (e) {
-        console.log(e); 
+        return res.send(error(401, e.message))
     }
 }
 
 export const genrateRefreshToken = (data) => {
     try {
         const token = jwt.sign(data, process.env.REFRESH_TOKEN_PRIVATE_KEY, { expiresIn: "1y" });
-        console.log(token);
         return token
-    } catch (error) {
-        console.log(error);
+    } catch (e) {
+        return res.send(error(401, e.message))
     }
 }
 

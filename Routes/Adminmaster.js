@@ -7,7 +7,6 @@ const upload = multer({ storage: storage })
 
 const adminmasterRouter = express.Router();
 
-// doctorRouter.get('/getAllDoctors',requireAdmin, getAllDoctors)
 adminmasterRouter.post('/addHospital', requireAdmin, upload.single("image"), addHospital)
 
 export { adminmasterRouter }

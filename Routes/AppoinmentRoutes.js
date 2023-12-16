@@ -25,19 +25,6 @@ Appointment.get('/getMissedAppointmentsForHospital/:hospitalid/:date',
 
 Appointment.get('/getMissedAppointmentsByTokenForHospital/:hospitalid/:date/missedByToken',
     getallappointmentsByTokenforparticularhospitalidmissed)
-
-
-
-
-
-
-
-
-
-
-
-//Integreted in website on 10-11-2023 (from here)
-// Get All pending Appointments for Doctor
 Appointment.get('/getPendingAppoinmentForDoctor/:doctorid/:date', requireUser, getAllPendingAppointmentOfDoctor)
 
 // Get All completed Appointments for Doctor
@@ -56,7 +43,6 @@ Appointment.get('/getCompletedAppoinmentByTokenForDoctor/:doctorid/:date', requi
 Appointment.get('/getMissedAppoinmentByTokenForDoctor/:doctorid/:date', requireUser, getAllMissedAppointmentByTokenOfDoctor)
 
 
-//(To here)
 
 // Pi chart Api rout here
 Appointment.get('/getPiChartData/:doctorid/:date/piChart', requireUser, Appointmentstatusinpercentage)

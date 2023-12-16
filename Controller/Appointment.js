@@ -45,13 +45,10 @@ const createAppointmnt = async (req, res) => {
                 appointmentDate,
                 AppointmentTime
             })
-            // await Appointmentdata.populate(["doctorid", "hospitalid"])
-            // console.log("aappooint aa gyi" + isappointmentexist);
             return res.send(success(201, Appointmentdata))
 
         }
         const isappointmentexist = await AppointmentModel.findOne({ $and: [{ doctorid }, { userid }, { appointmentDate }, { status: "pending" }] });
-        console.log("aappoointcoming: " + isappointmentexist);
         if (isappointmentexist !== null) {
             return res.send(error(409, "Appointment is already exist"));
         }
@@ -371,8 +368,6 @@ const getAllMissedAppointmentByTokenOfDoctor = async (req, res) => {
 
 const getUpcomingAppointmentForAnUser = async (req, res) => {
     const { Patient_id, doctorid } = req.params;
-    console.log("dotorid", doctorid)
-    console.log(Patient_id);
     if (doctorid) {
         const allappointment = await AppointmentModel.find({
             $and: [{ userid: doctorid },
@@ -423,7 +418,6 @@ const getUpcomingAppointmentForAnUser = async (req, res) => {
 // get all completed appointments for perticular patient
 const getCompletedAppointmentsForAnUser = async (req, res) => {
     const { Patient_id } = req.params;
-    console.log(Patient_id);
     const allappointment = await AppointmentModel.find({
         $and: [{ userid: Patient_id },
         { status: "completed" }
@@ -434,8 +428,6 @@ const getCompletedAppointmentsForAnUser = async (req, res) => {
         { status: "completed" }
         ]
     }).populate("doctorid")
-    console.log(allappointment)
-    // $and: [{ doctor_id: doctorid }, { date: newdate }]
     try {
         if (allappointment === null) {
             return res.send(error(404, "no appointment found by this doctor"));
@@ -450,8 +442,6 @@ const getCompletedAppointmentsForAnUser = async (req, res) => {
 
 const getMissedAppointmentsForAnUser = async (req, res) => {
     const { Patient_id } = req.params;
-    console.log(Patient_id);
-
     try {
         const allappointment = await AppointmentModel.find(
             {
@@ -465,11 +455,6 @@ const getMissedAppointmentsForAnUser = async (req, res) => {
                 status: { $in: ["missed", "cancelled"] }
             }
         ).populate("doctorid")
-
-
-        // if (!allappointment || allappointment.length === 0) {
-        //     return res.send(error(404, "No appointments found for this user."));
-        // }
 
         return res.send(success(200, [...allappointment, ...allappointmentbytoken]));
     } catch (e) {
@@ -577,34 +562,6 @@ const getallappointmentsByTokenforparticularhospitalidmissed = async (req, res) 
 }
 
 
-
-
-
-
-
-
-
-
-// const getMissedAppointmentsForAnUser = async (req, res) => {
-//     const { Patient_id } = req.params;
-//     console.log(Patient_id);
-//     const allappointment = await AppointmentModel.find({
-//         $and: [{ userid: Patient_id },
-//     { status: "missed" }, { status: "pending" }
-//         ]
-//     }).populate("doctorid");
-//     console.log(allappointment)
-//     // $and: [{ doctor_id: doctorid }, { date: newdate }]
-//     try {
-//         if (allappointment === null) {
-//             return res.send(error(404, "no appointment found by this doctor"));
-//         }
-//         return res.send(success(200, allappointment));
-//     } catch (e) {
-//         return res.send(error(500, e.message));
-//     }
-// }
-
 const Totalapatient = async (req, res) => {
     const { doctorid, date } = req.params;
     const newdate = new Date(date);
@@ -612,7 +569,6 @@ const Totalapatient = async (req, res) => {
     const month = newdate.getMonth();
     const intialdate = `${year}-${month}-01`
     const intialdat = new Date(intialdate);
-    console.log("this is initil date", intialdat)
 
     try {
         const allpatient = await AppointmentModel.
@@ -688,14 +644,12 @@ const FutureappointmentForAppointmentByToken = async (req, res) => {
 
 const Appointmentstatusinpercentage = async (req, res) => {
     const { doctorid, date } = req.params;
-    console.log(doctorid, date);
     const stringdate = new Date(date)
     try {
         const totalappointment = await AppointmentModel.find({ $and: [{ doctorid }, { appointmentDate: stringdate }] }).countDocuments();
         const pendingapointment = await AppointmentModel.find({ $and: [{ doctorid }, { status: "pending" }, { appointmentDate: stringdate }] }).countDocuments();
         const completedappointment = await AppointmentModel.find({ $and: [{ doctorid }, { status: "completed" }, { appointmentDate: stringdate }] }).countDocuments();
         const cancelledapointment = await AppointmentModel.find({ $and: [{ doctorid }, { status: "cancelled" }, { appointmentDate: stringdate }] }).countDocuments();
-        console.log(totalappointment, completedappointment)
         const PA = (100 * pendingapointment) / totalappointment;
         const COMPA = (100 * completedappointment) / totalappointment;
         const CA = (100 * cancelledapointment) / totalappointment;
@@ -708,14 +662,12 @@ const Appointmentstatusinpercentage = async (req, res) => {
 
 const AppointmentstatusinpercentageForAppointmentByToken = async (req, res) => {
     const { doctorid, date } = req.params;
-    console.log(doctorid, date);
     const stringdate = new Date(date)
     try {
         const totalappointment = await AppointmentTokenModel.find({ $and: [{ doctorid }, { appointmentDate: stringdate }] }).countDocuments();
         const pendingapointment = await AppointmentTokenModel.find({ $and: [{ doctorid }, { status: "pending" }, { appointmentDate: stringdate }] }).countDocuments();
         const completedappointment = await AppointmentTokenModel.find({ $and: [{ doctorid }, { status: "completed" }, { appointmentDate: stringdate }] }).countDocuments();
         const cancelledapointment = await AppointmentTokenModel.find({ $and: [{ doctorid }, { status: "cancelled" }, { appointmentDate: stringdate }] }).countDocuments();
-        console.log(totalappointment, completedappointment)
         const PA = (100 * pendingapointment) / totalappointment;
         const COMPA = (100 * completedappointment) / totalappointment;
         const CA = (100 * cancelledapointment) / totalappointment;
