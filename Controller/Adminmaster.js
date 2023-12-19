@@ -19,7 +19,8 @@ const addHospital = async (req, res) => {
         email,
         phone,
         password,
-        imgurl
+        imgurl,
+        mapLink
     } = req.body
 
     const file = req.file
@@ -63,7 +64,8 @@ const addHospital = async (req, res) => {
             email,
             phone,
             img: imageName,
-            password: hashedPassword
+            password: hashedPassword,
+            mapLink,
         })
         newHospital.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + newHospital.img
         await newHospital.save();

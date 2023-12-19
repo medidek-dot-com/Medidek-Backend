@@ -64,6 +64,7 @@ const addDoctor = async (req, res) => {
         category2,
         category3,
         category4,
+        mapLink,
     } = req.body
 
     const file = req.file
@@ -125,7 +126,8 @@ const addDoctor = async (req, res) => {
             category4,
             landmark,
             enterFullAddress,
-            doctorid
+            doctorid,
+            mapLink,
         })
         newDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + newDoctor.img
         await newDoctor.save();

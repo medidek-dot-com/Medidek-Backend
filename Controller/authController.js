@@ -90,13 +90,6 @@ export const varifyOtpAndSignUpController = async (req, res) => {
     }
 };
 export const sendOTPToEmail = async (email, otp) => {
-
-    // const oldUser = await Master.findOne({ email })
-
-    // if (oldUser) {
-    //     // return res.status(400).send("User is already registered");
-
-    // }
     const params = {
         Destination: {
             ToAddresses: [email],

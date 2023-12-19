@@ -11,6 +11,9 @@ const MasterShema = new mongoose.Schema({
     {
         type: mongoose.Schema.Types.ObjectId, ref: 'Master',
     },
+    mapLink: {
+        type: String
+    },
     dob: {
         type: Date,
     },

@@ -19,6 +19,9 @@ const MasterShema = new mongoose.Schema({
         default: "https://d26dtlo3dcke63.cloudfront.net/67c30e16c91a42ff9f30f84959a0ce1be155b24d8bbe14583d51cbfcc430fdba"
     },
     gender: { type: String },
+    mapLink: {
+        type: String,
+    },
     medicalRecord: [{ type: mongoose.Schema.Types.ObjectId, ref: 'MedicalRecord' }]
 
 

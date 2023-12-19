@@ -26,6 +26,9 @@ const MasterShema = new mongoose.Schema({
         type: String,
         default: "https://d26dtlo3dcke63.cloudfront.net/67c30e16c91a42ff9f30f84959a0ce1be155b24d8bbe14583d51cbfcc430fdba"
     },
+    mapLink: {
+        type: String
+    },
     createddate: { type: Date, default: new Date() },
 
 }, { timestamps: true })

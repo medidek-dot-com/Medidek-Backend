@@ -8,6 +8,7 @@ import crypto from "crypto";
 const generateFileName = (bytes = 32) =>
   crypto.randomBytes(bytes).toString("hex");
 
+
 const hospitalprofileupdate = async (req, res) => {
   const { id } = req.params;
   const file = req.file;
@@ -17,7 +18,8 @@ const hospitalprofileupdate = async (req, res) => {
     location,
     landmark,
     enterFullAddress,
-    imgurl
+    imgurl,
+    mapLink
   } = req.body;
 
 
@@ -45,6 +47,7 @@ const hospitalprofileupdate = async (req, res) => {
         landmark,
         enterFullAddress,
         img: imageName,
+        mapLink,
       },
       { new: true }
     ).select("-password")
@@ -59,19 +62,16 @@ const hospitalprofileupdate = async (req, res) => {
       newloaction.location = data.location;
       await newloaction.save();
     }
-    // await result.save();
     res.send(success(200, data));
   } catch (e) {
     res.send(error(500, e.message));
   }
 };
-
 const getdoctorbytheirid = async (req, res) => {
   const { doctorid, hospitalId } = req.body;
   if (!doctorid && !hospitalId) {
     return res.send(error(409, { msg: "pls give doctorid and hospitalid" }));
   }
-  // let hospitalId = "5349b4ddd2781d08c09890f3";
   try {
     const isdoctoravailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId }, { status: "ACTIVE" }] })
     if (isdoctoravailableinhospital) {
@@ -107,7 +107,8 @@ const addDoctorbyhospital = async (req, res) => {
     category3,
     category4,
     description,
-    location
+    location,
+    mapLink,
   } = req.body;
 
   if (
@@ -155,7 +156,8 @@ const addDoctorbyhospital = async (req, res) => {
           category2,
           category3,
           category4,
-          description
+          description,
+          mapLink,
         },
         { new: true }
       );
@@ -179,7 +181,8 @@ const addDoctorbyhospital = async (req, res) => {
       category3,
       category4,
       description,
-      location
+      location,
+      mapLink,
     });
     addDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + addDoctor.img
     return res.send(success(200, { addDoctor }));
@@ -200,16 +203,6 @@ const getSingleDoctor = async (req, res) => {
     return res.send(error(500, e));
   }
 };
-
-
-
-
-
-
-
-
-
-
 const getSingleStaff = async (req, res) => {
   try {
     let result = await staff.findById(req.params.id);
@@ -219,7 +212,6 @@ const getSingleStaff = async (req, res) => {
     return res.send(error(500, e));
   }
 };
-
 const editDoctorbyhospital = async (req, res) => {
   const { hospitalid } = req.params;
   const file = req.file;
@@ -237,7 +229,8 @@ const editDoctorbyhospital = async (req, res) => {
     category2,
     category3,
     category4,
-    description
+    description,
+    mapLink,
   } = req.body;
 
   if (
@@ -278,7 +271,8 @@ const editDoctorbyhospital = async (req, res) => {
         category2,
         category3,
         category4,
-        description
+        description,
+        mapLink,
       },
       { new: true }
     );
@@ -289,7 +283,6 @@ const editDoctorbyhospital = async (req, res) => {
     res.status(500).send({ error, status: "error", code: 500 });
   }
 };
-
 const AddStaff = async (req, res) => {
   const file = req.file;
   const {
@@ -299,7 +292,6 @@ const AddStaff = async (req, res) => {
     phone,
     hospitalId,
     gender,
-    // dob,
   } = req.body;
   if (
     !nameOfStaff ||
@@ -308,7 +300,6 @@ const AddStaff = async (req, res) => {
     !phone ||
     !hospitalId ||
     !gender
-    // !dob
   ) {
     return res.send(error(400, "pls filled all field"));
   }
@@ -327,7 +318,7 @@ const AddStaff = async (req, res) => {
       email,
       phone,
       hospitalId,
-      // dob,
+      mapLink,
       img: imageName,
     });
     result.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + result.img
@@ -337,7 +328,6 @@ const AddStaff = async (req, res) => {
     return res.send(error(500, e.message));
   }
 };
-
 const editStaff = async (req, res) => {
   const file = req.file;
   const { id } = req.params;
@@ -349,6 +339,7 @@ const editStaff = async (req, res) => {
     hospitalId,
     gender,
     dob,
+    mapLink,
   } = req.body;
 
   const imageName = file ? generateFileName() : "";
@@ -377,7 +368,6 @@ const editStaff = async (req, res) => {
     return res.send(error(500, e));
   }
 };
-
 const alldoctorandstaffforhospital = async (req, res) => {
   const { hospid } = req.params;
   try {
@@ -408,7 +398,6 @@ const alldoctors = async (req, res) => {
     res.send(error(e.message));
   }
 };
-
 const statusupdatedoctortoremove = async (req, res) => {
   const { doctorid } = req.params
   const { status } = req.body;

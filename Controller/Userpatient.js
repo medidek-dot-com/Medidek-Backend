@@ -93,13 +93,13 @@ const usersignup = async (req, res) => {
     const ishospital = await Master.findOne({ email, phone });
 
     if (ispatient) {
-        return res.send(error(409, "User is already exist"));
+        return res.send(error(409, "User already exists"));
     }
     if (isdoctor) {
-        return res.send(error(409, "User is already exist"));
+        return res.send(error(409, "User already exists"));
     }
     if (ishospital) {
-        return res.send(error(409, "User is already exist"));
+        return res.send(error(409, "User already exists"));
     }
 
     try {
@@ -252,7 +252,7 @@ const userpasswordupdated = async (req, res) => {
 
 const userprofileupdate = async (req, res) => {
     const { id } = req.params;
-    const { name, email, dateOfBirth, phone, imgurl, gender } = req.body;
+    const { name, email, dateOfBirth, phone, imgurl, gender, mapLink } = req.body;
     if (!name || !email || !dateOfBirth || !phone, !gender) {
         return res.send(error(409, "pls filled all field"));
     }
@@ -266,7 +266,7 @@ const userprofileupdate = async (req, res) => {
             await uploadFile(fileBuffer, imageName, file.mimetype)
         }
         const data = await userpatient.findByIdAndUpdate({ _id: id }, {
-            name, email, dateOfBirth, phone, img: imageName, gender
+            name, email, dateOfBirth, phone, img: imageName, gender, mapLink
         }, { new: true })
         data.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + data.img
         await data.save();
