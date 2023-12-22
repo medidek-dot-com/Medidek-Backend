@@ -4,6 +4,7 @@ import express from 'express'
 import { usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword, userprofileupdate } from '../Controller/Userpatient.js';
 import { requireUser } from '../Middleware/requireUser.js'
 import multer from "multer";
+import { Searchdoctorbylocation, Searchdoctorbyuser } from '../Controller/searchcontroller.js';
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
 const userCreationRouter = express.Router();
@@ -16,7 +17,11 @@ userCreationRouter.post('/userpasswordupdated', userpasswordupdated)
 userCreationRouter.get('/getusergetalldoctors', usergetalldoctors)
 userCreationRouter.post('/FindUserByNameAndPassword', usersignin)
 userCreationRouter.post('/forgotpassword', userforgotpassword)
-// userCreationRouter.get("/getalldoctors", usergetalldoctors)
+userCreationRouter.get('/searchdoctor/:lat/:long', Searchdoctorbyuser)
+
+
+userCreationRouter.post('/doctorsByLocation', Searchdoctorbylocation)
+// userCreationRouter.get("/getalldoctors", usergetalldoctors)     
 
 
 

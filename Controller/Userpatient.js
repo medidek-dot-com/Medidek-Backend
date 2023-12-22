@@ -20,6 +20,7 @@ const generateFileName = (bytes = 32) =>
 
 
 const usergetalldoctors = async (req, res) => {
+
     try {
         const alldoctors = await Doctor.find({});
         let newarr = [];
