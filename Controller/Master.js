@@ -8,6 +8,26 @@ import crypto from "crypto";
 const generateFileName = (bytes = 32) =>
   crypto.randomBytes(bytes).toString("hex");
 
+const getHotspitalsDoctorForHomeScreen = async(req, res)=>{
+  try {
+      const findHospitals = await Master.find().populate("doctors");
+      // const findHospitals = await Master.find({hospitalId:{$ne: "6531c8f389aee1b3fbd0a2d7"}}).populate("doctors");
+      
+    return  res.send(success(200, findHospitals))
+  } catch (error) {
+    return res.send(error(error.message))
+  }
+}
+const getHotspitalsByIdAndTheirsDoctors = async(req, res)=>{
+  const {hospitalId} = req.params
+  try {
+      const findHospitals = await Master.find({_id:hospitalId}).populate("doctors")
+      
+    return  res.send(success(200, findHospitals))
+  } catch (error) {
+    return res.send(error(error.message))
+  }
+}
 
 const hospitalprofileupdate = async (req, res) => {
   const { id } = req.params;
@@ -88,6 +108,39 @@ const getdoctorbytheirid = async (req, res) => {
     res.send(error(500, e.message));
   }
 };
+
+const getAllHospitalsWithAllQuery = async (req, res) => {
+
+  // const nameOfTheDoctor = req.query.nameOfTheDoctor || ""
+  // const speciality = req.query.speciality || ""
+  // const location = req.query.location || ""
+  // const landmark = req.query.landmark || ""
+  // const enterFullAddress = req.query.landmark || ""
+
+  try {
+    const userInput = req.query.userInput;
+
+    // Use the user input to search the database in all specified keys
+    const hospitals = await Master.find({
+      $or: [
+        { nameOfhospitalOrClinic: new RegExp(userInput, 'i') },
+        { hospitalType: new RegExp(userInput, 'i') },
+        { location: new RegExp(userInput, 'i') },
+        { landmark: new RegExp(userInput, 'i') },
+        { mapLink: new RegExp(userInput, 'i') },
+        // { connsultationFee: new RegExp(userInput, 'i') }
+      ]
+    });
+
+    return res.send(success(200, hospitals));
+
+  } catch (e) {
+    res.send(error(500, e.message));
+  }
+
+};
+
+//Testing this api for add doctor's in hospital and push doctor's id into doctors array
 
 const addDoctorbyhospital = async (req, res) => {
   const { hospitalid } = req.params;
@@ -184,13 +237,122 @@ const addDoctorbyhospital = async (req, res) => {
       location,
       mapLink,
     });
+
+    await Master.findOneAndUpdate(
+      { _id: hospitalid },
+      { $addToSet: { doctors: addDoctor._id } }
+    );
+
     addDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + addDoctor.img
     return res.send(success(200, { addDoctor }));
 
   } catch (e) {
     res.send(error(500, e.message));
   }
+
 };
+// const addDoctorbyhospital = async (req, res) => {
+//   const { hospitalid } = req.params;
+//   const file = req.file;
+//   const {
+//     nameOfTheDoctor,
+//     qulification,
+//     speciality,
+//     yearOfExprience,
+//     email,
+//     phone,
+//     connsultationFee,
+//     doctorid,
+//     imgurl,
+//     category1,
+//     category2,
+//     category3,
+//     category4,
+//     description,
+//     location,
+//     mapLink,
+//   } = req.body;
+
+//   if (
+//     !nameOfTheDoctor ||
+//     !qulification ||
+//     !speciality ||
+//     !yearOfExprience ||
+//     !email ||
+//     !phone ||
+//     !connsultationFee ||
+//     !doctorid ||
+//     !hospitalid ||
+//     !location
+//   ) {
+//     return res.send(error(401, "All fields are compulsory"));
+//   }
+//   const imageName = file ? generateFileName() : imgurl;
+//   const fileBuffer = file?.buffer;
+//   if (fileBuffer) {
+//     await uploadFile(fileBuffer, imageName, file.mimetype);
+//   }
+
+//   try {
+//     const isdoctoravailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId: hospitalid }, { status: "ACTIVE" }] })
+//     if (isdoctoravailableinhospital) {
+//       return res.send(error(500, { msg: "this doctor already available in your hospital" }))
+//     }
+//     const isdoctorpreviouslyavailableinhospital = await Doctor.findOne({ $and: [{ doctorid }, { hospitalId: hospitalid }, { status: "REMOVED" }] })
+//     if (isdoctorpreviouslyavailableinhospital) {
+//       const editDoctor = await Doctor.findOneAndUpdate(
+//         { $and: [{ doctorid }, { hospitalId: hospitalid }, { status: "REMOVED" }] },
+//         {
+//           nameOfTheDoctor,
+//           qulification,
+//           speciality,
+//           yearOfExprience,
+//           email,
+//           phone,
+//           connsultationFee,
+//           hospitalId: hospitalid,
+//           doctorid,
+//           img: imageName,
+//           status: "ACTIVE",
+//           category1,
+//           category2,
+//           category3,
+//           category4,
+//           description,
+//           mapLink,
+//         },
+//         { new: true }
+//       );
+
+//       editDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + editDoctor.img
+//       return res.send(success(200, { editDoctor }));
+//     }
+//     const addDoctor = await Doctor.create({
+//       nameOfTheDoctor,
+//       qulification,
+//       speciality,
+//       yearOfExprience,
+//       email,
+//       phone,
+//       connsultationFee,
+//       hospitalId: hospitalid,
+//       img: imageName,
+//       doctorid,
+//       category1,
+//       category2,
+//       category3,
+//       category4,
+//       description,
+//       location,
+//       mapLink,
+//     });
+//     addDoctor.imgurl = "https://d26dtlo3dcke63.cloudfront.net/" + addDoctor.img
+//     return res.send(success(200, { addDoctor }));
+
+//   } catch (e) {
+//     res.send(error(500, e.message));
+//   }
+// };
 
 const getSingleDoctor = async (req, res) => {
   try {
@@ -423,5 +585,8 @@ export {
   alldoctorandstaffforhospital,
   getSingleDoctor,
   alldoctors,
-  statusupdatedoctortoremove
+  getAllHospitalsWithAllQuery,
+  statusupdatedoctortoremove,
+  getHotspitalsDoctorForHomeScreen,
+  getHotspitalsByIdAndTheirsDoctors
 };

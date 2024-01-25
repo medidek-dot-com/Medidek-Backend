@@ -30,6 +30,7 @@ const MasterShema = new mongoose.Schema({
         type: String
     },
     createddate: { type: Date, default: new Date() },
+    doctors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' }],
 
 }, { timestamps: true })
 

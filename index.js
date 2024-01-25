@@ -18,6 +18,8 @@ import { adminauthRouter } from './Routes/Adminauthroute.js'
 import { adminRoiuter } from './Routes/Adminroute.js'
 import { adminmasterRouter } from './Routes/Adminmaster.js'
 import { admindoctorRouter } from './Routes/Admindoctorroute.js'
+import { blogRouter } from './Routes/BlogRoute.js'
+import { dynamicAddingDoctorsRouter } from './Routes/DynamicAddingDoctors.js'
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -48,6 +50,8 @@ app.use("/v2", adminRoiuter)
 app.use("/v2", admindoctorRouter)
 app.use("/v2", adminmasterRouter)
 app.use("/v2", adminauthRouter)
+app.use("/v2", blogRouter)
+app.use("/v2", dynamicAddingDoctorsRouter)
 
 dbConnection()
 app.listen(PORT, () => console.log(`Listening on port ${PORT}`));

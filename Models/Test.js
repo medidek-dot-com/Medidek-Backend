@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 
-const MasterShema = new mongoose.Schema({
+const DoctorSchema = new mongoose.Schema({
     nameOfTheDoctor: { type: String },
     qulification: { type: String, },
     speciality: { type: String },
@@ -9,15 +9,18 @@ const MasterShema = new mongoose.Schema({
         { type: Number },
     email: {
         type: String,
-    },
-    username: {
-        type: String,
+        required: true,
     },
     phone:
     {
         type: Number,
+        min: 10,
+        required: true,
     },
     password: {
+        type: String,
+    },
+    username: {
         type: String,
     },
     connsultationFee: {
@@ -85,9 +88,9 @@ const MasterShema = new mongoose.Schema({
     enterFullAddress: { type: String },
 }, { timestamps: true })
 
-const Doctor = mongoose.model("Doctor", MasterShema)
+const Test = mongoose.model("test", DoctorSchema)
 
-export { Doctor }
+export { Test }
 
 
 

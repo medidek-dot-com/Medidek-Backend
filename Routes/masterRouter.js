@@ -1,5 +1,5 @@
 import express from 'express'
-import { hospitalprofileupdate, addDoctorbyhospital, getdoctorbytheirid, editDoctorbyhospital, AddStaff, editStaff, alldoctorandstaffforhospital, getSingleDoctor, getSingleStaff, alldoctors, statusupdatedoctortoremove } from '../Controller/Master.js';
+import { hospitalprofileupdate, addDoctorbyhospital, getdoctorbytheirid, editDoctorbyhospital, AddStaff, editStaff, alldoctorandstaffforhospital, getSingleDoctor, getSingleStaff, alldoctors, statusupdatedoctortoremove, getHotspitalsDoctorForHomeScreen, getHotspitalsByIdAndTheirsDoctors, getAllHospitalsWithAllQuery } from '../Controller/Master.js';
 import { requireUser } from '../Middleware/requireUser.js';
 const masterRouter = express.Router();
 import multer from "multer";
@@ -18,5 +18,9 @@ masterRouter.get("/getAlldoctor/:hospid", requireUser, alldoctors);
 masterRouter.get("/singledoctor/:id", requireUser, getSingleDoctor)
 masterRouter.get("/singlestaff/:id", requireUser, getSingleStaff)
 masterRouter.put("/updateDoctorStatusToRemove/:doctorid", requireUser, statusupdatedoctortoremove)
+
+masterRouter.get("/getAllHospitalsWithAllQuery", getAllHospitalsWithAllQuery)
+masterRouter.get("/getHotspitalsDoctorForHomeScreen", getHotspitalsDoctorForHomeScreen)
+masterRouter.get("/getHospitalByIdAndTheirsDoctors/:hospitalId", getHotspitalsByIdAndTheirsDoctors)
 
 export { masterRouter } 

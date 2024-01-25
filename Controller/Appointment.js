@@ -230,9 +230,9 @@ const getallappointmentofdoctor = async (req, res) => {
     const { doctorid } = req.params;
     const allappointment = await AppointmentModel.find({ doctorid }).populate("userid");
     try {
-        if (allappointment === null) {
-            return res.status(200).send({ msg: "no appointment found by this doctor" });
-        }
+        // if (allappointment === null) {
+        //     return res.status(200).send({ msg: "no appointment found by this doctor" });
+        // }
         return res.send(success(200, allappointment));
     } catch (e) {
         return res.send(error(500, e.message));
@@ -240,21 +240,28 @@ const getallappointmentofdoctor = async (req, res) => {
 }
 const getAllPendingAppointmentOfDoctor = async (req, res) => {
     const { doctorid, date } = req.params;
+    const nidate = new Date(date);
     // const { date } = req.query;
-
-    const allappointment = await AppointmentModel.find({
-        $and: [{ doctorid },
-        { status: "pending" },
-        { appointmentDate: date }
-        ]
-    }).populate(["userid"]);
-
     // ({ doctorid }).populate("userid");
     try {
-        if (allappointment === null) {
-            return res.status(200).send({ msg: "no appointment found by this doctor" });
-        }
-        return res.send(success(200, allappointment));
+        // if (allappointment.length === 0) {
+        //     return res.send(success(200, "no appointment found by this doctor"));
+        // }
+        const allSlotappointment = await AppointmentModel.find({
+            $and: [{ doctorid: doctorid },
+            { status: "pending" },
+            { appointmentDate: nidate }
+            ]
+        });
+
+        const allTokenappointment = await AppointmentTokenModel.find({
+            $and: [{ doctorid },
+            { status: "pending" },
+            { appointmentDate: nidate }
+            ]
+        }).populate(["userid"]);
+
+        return res.send(success(200, [...allSlotappointment, ...allTokenappointment]));
     } catch (e) {
         return res.send(error(500, e.message));
     }
@@ -270,9 +277,10 @@ const getAllCompletedAppointmentOfDoctor = async (req, res) => {
 
     // ({ doctorid }).populate("userid");
     try {
-        if (allappointment === null) {
-            return res.status(200).send({ msg: "no appointment found by this doctor" });
-        }
+        // if (allappointment.length === 0) {
+        //     return res.send(success(200, "no appointment found by this doctor"));
+
+        // }
         return res.send(success(200, allappointment));
     } catch (e) {
         return res.send(error(500, e.message));
@@ -289,9 +297,9 @@ const getAllMissedAppointmentOfDoctor = async (req, res) => {
 
     // ({ doctorid }).populate("userid");
     try {
-        if (allappointment === null) {
-            return res.send(error(404, "no appointment found by this doctor"));
-        }
+        // if (allappointment.length === 0) {
+        //     return res.send(success(200, "no appointment found by this doctor"));
+        // }
         return res.send(success(200, allappointment));
     } catch (e) {
         return res.send(error(500, e.message));
@@ -315,9 +323,9 @@ const getAllPendingAppointmentByTokenOfDoctor = async (req, res) => {
 
     // ({ doctorid }).populate("userid");
     try {
-        if (allappointment === null) {
-            return res.send(error(404, "no appointment found by this doctor"))
-        }
+        // if (allappointment.length === 0) {
+        //     return res.send(success(200, "no appointment found by this doctor"))
+        // }
         return res.send(success(200, allappointment));
     } catch (e) {
         return res.send(error(500, e.message));
@@ -335,9 +343,9 @@ const getAllCompletedAppointmentByTokenOfDoctor = async (req, res) => {
 
     // ({ doctorid }).populate("userid");
     try {
-        if (allappointment === null) {
-            return res.status(200).send({ msg: "no appointment found by this doctor" });
-        }
+        // if (allappointment.length === 0) {
+        //     return res.send(success(200, "no appointment found by this doctor"));
+        // }
         return res.send(success(200, allappointment));
     } catch (e) {
         return res.send(error(500, e.message));
@@ -355,9 +363,9 @@ const getAllMissedAppointmentByTokenOfDoctor = async (req, res) => {
 
     // ({ doctorid }).populate("userid");
     try {
-        if (allappointment === null) {
-            return res.send(error(404, "no appointment found by this doctor"));
-        }
+        // if (allappointment.length === 0) {
+        //     return res.send(success(200, "no appointment found by this doctor"));
+        // }
         return res.send(success(200, allappointment));
     } catch (e) {
         return res.send(error(500, e.message));
@@ -381,9 +389,10 @@ const getUpcomingAppointmentForAnUser = async (req, res) => {
             ]
         })
         try {
-            if (allappointment === null) {
-                return res.send(error(404, "no appointment found by this doctor"));
-            }
+            // if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
+            //     return res.send(success(200, "no appointment found by this doctor"));
+            // }
+
             return res.send(success(200, [allappointment, allappointmentbytoken]));
         } catch (e) {
             return res.send(error(500, e.message));
@@ -402,10 +411,12 @@ const getUpcomingAppointmentForAnUser = async (req, res) => {
             ]
         }).populate("doctorid")
         try {
-            if (allappointment === null) {
-                return res.send(error(404, "no appointment found by this doctor"));
-            }
+            // if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
+            //     return res.send(success(200, "no appointment found by this doctor"));
+            // }
+            // else {
             return res.send(success(200, [...allappointment, ...allappointmentbytoken]));
+            // }
         } catch (e) {
             return res.send(error(500, e.message));
         }
@@ -429,8 +440,8 @@ const getCompletedAppointmentsForAnUser = async (req, res) => {
         ]
     }).populate("doctorid")
     try {
-        if (allappointment === null) {
-            return res.send(error(404, "no appointment found by this doctor"));
+        if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
+            return res.send(success(200, "no appointment found by this doctor"));
         }
         return res.send(success(200, [...allappointment, ...allappointmentbytoken]));
     } catch (e) {
@@ -455,6 +466,9 @@ const getMissedAppointmentsForAnUser = async (req, res) => {
                 status: { $in: ["missed", "cancelled"] }
             }
         ).populate("doctorid")
+        // if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
+        //     return res.send(success(200, "no appointment found by this doctor"));
+        // }
 
         return res.send(success(200, [...allappointment, ...allappointmentbytoken]));
     } catch (e) {

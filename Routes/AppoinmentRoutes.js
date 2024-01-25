@@ -93,7 +93,7 @@ Appointment.get('/getPatientAppointment/:Patient_id', requireUser, getAppointmen
 
 // 1. Get All pending appointments for perticular patient
 Appointment.get('/getPendingAppointmentForPatient/:Patient_id', requireUser, getUpcomingAppointmentForAnUser)
-Appointment.get('/getPendingAppointmentForDoctor/:doctorid', requireUser, getUpcomingAppointmentForAnUser)
+Appointment.get('/getPendingAppointmentForDoctor/:doctorid/:date', requireUser, getAllPendingAppointmentOfDoctor)
 
 // 2. Get All completed appointments for perticular patient
 
