@@ -21,7 +21,7 @@ const getHotspitalsDoctorForHomeScreen = async(req, res)=>{
 const getHotspitalsByIdAndTheirsDoctors = async(req, res)=>{
   const {hospitalId} = req.params
   try {
-      const findHospitals = await Master.find({_id:hospitalId}).populate("doctors")
+      const findHospitals = await Master.findOne({_id:hospitalId}).populate("doctors")
       
     return  res.send(success(200, findHospitals))
   } catch (error) {
