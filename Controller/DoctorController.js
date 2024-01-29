@@ -166,6 +166,22 @@ const getDoctorWithSpeciality = async (req, res) => {
   }
 };
 
+const getSpeacilityList = async (req, res) => {
+
+  const {speciality} = req.body;
+
+  try {
+    
+  const specialityList =  await Doctor.find({speciality: { $regex: speciality, $options: 'i' }}).distinct('speciality')
+
+  return res.send(success(200, specialityList));
+  } catch (e) {
+    return res.send(error(500, e.message));
+  }
+
+  
+};
+
 // const getAllDoctorWithSpecificQuery = async (req, res) => {
 
 //   // const nameOfTheDoctor = req.query.nameOfTheDoctor || ""
@@ -246,5 +262,5 @@ const getDoctorWithSpeciality = async (req, res) => {
 
 
 
-export { editDoctorfile, multipleloginprofile, acceptAppointmentBySlotEditController, acceptAppointmentByTokenEditController, getAllDoctorWithAllQuery, getDoctorWithSpeciality }
+export { editDoctorfile, multipleloginprofile, acceptAppointmentBySlotEditController, acceptAppointmentByTokenEditController, getAllDoctorWithAllQuery, getDoctorWithSpeciality, getSpeacilityList }
 
