@@ -168,7 +168,7 @@ const getDoctorWithSpeciality = async (req, res) => {
 
 const getSpeacilityList = async (req, res) => {
 
-  const {speciality} = req.body;
+  const {speciality} = req.query;
 
   try {
     

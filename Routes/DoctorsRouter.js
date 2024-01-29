@@ -14,7 +14,7 @@ Router.get("/multipleloginprofile/:doctorid", requireUser, multipleloginprofile)
 Router.get("/getAllDoctorWithAllQuery", getAllDoctorWithAllQuery);
 
 Router.get("/getDoctorWithSpeciality", getDoctorWithSpeciality);
-Router.post("/getSpeacilityList", getSpeacilityList);
+Router.get("/getSpeacilityList", getSpeacilityList);
 
 
 
