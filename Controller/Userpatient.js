@@ -225,29 +225,35 @@ const userforgotpassword = async (req, res) => {
 
 const userpasswordupdated = async (req, res) => {
     const { password, role, phone } = req.body;
-    if (role === "PATIENT") {
-        const result = await userpatient.findOne({ phone });
 
-        const hashedPassword = await bcrypt.hash(password, 10);
-        result.password = hashedPassword;
-        result.save();
-        return res.send(success(200, { msg: "user password updated succesfully" }));
-    }
-    if (role === "DOCTOR") {
-        const result = await Doctor.findOne({ phone });
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        result.password = hashedPassword;
-        result.save();
-        return res.send(success(200, { msg: "user password updated succesfully" }));
-    }
-    if (role === "MASTER") {
-        const result = await Master.findOne({ phone });
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        result.password = hashedPassword;
-        result.save();
-        return res.send(success(200, { msg: "user password updated succesfully" }));
+    try {
+        if (role === "PATIENT") {
+            const result = await userpatient.findOne({ phone });
+            if(!result) return res.send(error(404, "User Not Found"));
+            const hashedPassword = await bcrypt.hash(password, 10);
+            result.password = hashedPassword;
+            result.save();
+            return res.send(success(200, { msg: "user password updated succesfully" }));
+        }
+        if (role === "DOCTOR") {
+            const result = await Doctor.findOne({ phone });
+            if(!result) return res.send(error(404, "User Not Found"));
+            const hashedPassword = await bcrypt.hash(password, 10);
+            result.password = hashedPassword;
+            result.save();
+            return res.send(success(200, { msg: "user password updated succesfully" }));
+        }
+        if (role === "MASTER") {
+            const result = await Master.findOne({ phone });
+            if(!result) return res.send(error(404, "User Not Found"));
+            const hashedPassword = await bcrypt.hash(password, 10);
+            result.password = hashedPassword;
+            result.save();
+            return res.send(success(200, { msg: "user password updated succesfully" }));
+        }
+        
+    } catch (e) {
+       return res.send(error(500, e.message)); 
     }
 }
 
