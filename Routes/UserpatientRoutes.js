@@ -1,7 +1,7 @@
 
 
 import express from 'express'
-import { usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword, userprofileupdate } from '../Controller/Userpatient.js';
+import { usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword, userprofileupdate,alldoctors } from '../Controller/Userpatient.js';
 import { requireUser } from '../Middleware/requireUser.js'
 import multer from "multer";
 import { Searchdoctorbylocation, Searchdoctorbyuser } from '../Controller/searchcontroller.js';
@@ -21,6 +21,9 @@ userCreationRouter.get('/searchdoctor/:lat/:long', Searchdoctorbyuser)
 
 
 userCreationRouter.post('/doctorsByLocation', Searchdoctorbylocation)
+userCreationRouter.get('/alldoctors', alldoctors)
+
+
 // userCreationRouter.get("/getalldoctors", usergetalldoctors)     
 
 

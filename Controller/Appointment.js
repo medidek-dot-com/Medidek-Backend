@@ -205,8 +205,15 @@ const changeappointmentstatus = async (req, res) => {
     const { id } = req.params;
     const { status, remark } = req.body;
     try {
-        const chnageappointmentstatusbydoctor = await AppointmentModel.findByIdAndUpdate({ _id: id }, { status, remark }, { new: true });
+        const chnageappointmentbyslot = await AppointmentModel.findByIdAndUpdate({ _id: id }, { status, remark }, { new: true });
+        if(chnageappointmentbyslot){
+            return res.send(success(200, "status changed succesfully")); 
+        }
+        const chnageappointmentstatus = await AppointmentTokenModel.findByIdAndUpdate({ _id: id }, { status, remark }, { new: true });
+        if(chnageappointmentstatus){
         return res.send(success(200, "status changed succesfully"));
+        }
+        
     } catch (e) {
         return res.send(error(500, e.message));
     }
@@ -459,17 +466,16 @@ const getMissedAppointmentsForAnUser = async (req, res) => {
                 userid: Patient_id,
                 status: { $in: ["missed", "cancelled"] }
             }
-        ).populate("doctorid");
+        ).sort({appointmentDate:-1}).populate("doctorid");
         const allappointmentbytoken = await AppointmentTokenModel.find(
             {
                 userid: Patient_id,
                 status: { $in: ["missed", "cancelled"] }
             }
-        ).populate("doctorid")
+        ).sort({appointmentDate:-1}).populate("doctorid")
         // if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
         //     return res.send(success(200, "no appointment found by this doctor"));
         // }
-
         return res.send(success(200, [...allappointment, ...allappointmentbytoken]));
     } catch (e) {
         return res.send(error(500, e.message));

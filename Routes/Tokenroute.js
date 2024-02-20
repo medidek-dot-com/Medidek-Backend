@@ -1,7 +1,7 @@
 import express from "express"
 import { requireUser } from "../Middleware/requireUser.js";
 const TokenRouter = express.Router();
-import { bookappointmentbytoken, createToken, getTokenData } from "../Controller/TokenController.js"
+import { bookappointmentbytoken, createToken, getTokenData, scheduleappointmentfordoctor } from "../Controller/TokenController.js"
 import { createAppointmnt, updateAppointmnt, updateAppointmntForAppointmentByToken } from "../Controller/Appointment.js";
 
 TokenRouter.post("/creatTokenForDoctor", requireUser, createToken);
@@ -13,6 +13,8 @@ TokenRouter.put("/editAppointmentForAppointmentByToken/:appointmentId", requireU
 TokenRouter.get("/getAppointmentByTokenSlotDetailForDoctorForPerticularDate/:doctorid/:date", requireUser, getTokenData);
 
 TokenRouter.post("/bookappointmentbytoken", requireUser, bookappointmentbytoken)
+
+TokenRouter.post("/scheduleappointmentfordoctor",scheduleappointmentfordoctor);
 // slotRouter.get("/slot", getslot);
 // slotRouter.get("/userslot", userslot);
 

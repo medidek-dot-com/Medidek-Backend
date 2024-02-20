@@ -19,33 +19,50 @@ const generateFileName = (bytes = 32) =>
     crypto.randomBytes(bytes).toString("hex");
 
 
+
+    const alldoctors =async(req,res)=>{
+        const data = await Doctor.find({});
+        return res.status(200).send({data:data,length:data.length});
+    }
+
+
+
+
 const usergetalldoctors = async (req, res) => {
 
     try {
         const alldoctors = await Doctor.find({});
-        let newarr = [];
-        for (let doctor of alldoctors) {
-            var getdocts = await Doctor.find({ doctorid: doctor.doctorid });
-            if (newarr.length == 0) {
-                newarr.push(getdocts[0])
+        const doctorSet = new Set();
+        const uniqueDoctors = [];
+        alldoctors.forEach((doctor) => {
+            if (!doctorSet.has(doctor.doctorid)) {
+              uniqueDoctors.push(doctor);
+              doctorSet.add(doctor.doctorid);
             }
-            else {
-                for (let i = 0; i < newarr.length; i++) {
-                    let c = i;
-                    if (newarr[c].doctorid === getdocts[0].doctorid) {
-                        break;
-                    }
-                    else {
-                        c++;
-                    }
-                    if (c == newarr.length) {
-                        newarr.push(getdocts[0])
-                        break;
-                    }
-                }
-            }
-        }
-        return res.send(success(200, newarr))
+          });
+          return res.send(success(200, uniqueDoctors))
+        // let newarr = [];
+        // for (let doctor of alldoctors) {
+        //     var getdocts = await Doctor.find({ doctorid: doctor.doctorid });
+        //     if (newarr.length == 0) {
+        //         newarr.push(getdocts[0])
+        //     }
+        //     else {
+        //         for (let i = 0; i < newarr.length; i++) {
+        //             let c = i;
+        //             if (newarr[c].doctorid === getdocts[0].doctorid) {
+        //                 break;
+        //             }
+        //             else {
+        //                 c++;
+        //             }
+        //             if (c == newarr.length) {
+        //                 newarr.push(getdocts[0])
+        //                 break;
+        //             }
+        //         }
+        //     }
+        // }
         // return res.send(success(200,alldoctors))
     } catch (e) {
         return res.send(error(e.message))
@@ -355,6 +372,7 @@ export {
     isUserExist,
     usergetalldoctors,
     changepassword,
-    userprofileupdate
+    userprofileupdate,
+    alldoctors
 }
 

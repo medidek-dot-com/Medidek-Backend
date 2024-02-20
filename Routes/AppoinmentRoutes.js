@@ -106,7 +106,7 @@ Appointment.get("/getMissedAppointment/:Patient_id", requireUser, getMissedAppoi
 
 Appointment.get("/getsingleappointmentbyid/:appointmentId/:status", requireUser, getsingleappointmentbyid)
 
-
+ 
 Appointment.put("/updateUserAppointment/:id", requireUser, updateAppointment)
 
 Appointment.put('/updateUserAppointmentStatus/:id', requireUser, changeappointmentstatus)

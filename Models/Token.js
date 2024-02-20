@@ -33,7 +33,7 @@ const TokenSchema = new mongoose.Schema({
         type: String,
         default: 0
     },
-    appointmentByToken: {
+    appointmentByToken: {  
         type: Boolean,
         default: true
     },

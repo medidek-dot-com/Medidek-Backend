@@ -574,7 +574,22 @@ const statusupdatedoctortoremove = async (req, res) => {
   }
 }
 
+
+const updatedoctorimgurl = async(req,res)=>{
+  const alldoctors = await Doctor.find({});
+  for(let i=0;i<alldoctors.length;i++){
+    const id = alldoctors[i]._id;
+    const imgurl ="https://d26dtlo3dcke63.cloudfront.net/45f72cedf7df9862690b91daf72a7731d272306b2928769eb0eaa9e92ba76135"
+    await Doctor.findByIdAndUpdate({_id:id},{imgurl:imgurl})
+  }
+  return res.status(200).send({alldoctors,length:alldoctors.length});
+}
+
+
+
+
 export {
+  updatedoctorimgurl,
   getSingleStaff,
   hospitalprofileupdate,
   getdoctorbytheirid,
