@@ -388,13 +388,14 @@ const getUpcomingAppointmentForAnUser = async (req, res) => {
             $and: [{ userid: doctorid },
             { status: "pending" }
             ]
-        }).populate("doctorid");
+        }).sort({appointmentDate:-1}).populate("doctorid");
 
-        const allappointmentbytoken = await AppointmentTokenModel.find({
+        const allappointmentbytoken = await Appoint
+        mentTokenModel.find({
             $and: [{ doctorid: doctorid },
             { status: "pending" }
             ]
-        })
+        }).sort({appointmentDate:-1}).populate("doctorid")
         try {
             // if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
             //     return res.send(success(200, "no appointment found by this doctor"));
@@ -410,13 +411,13 @@ const getUpcomingAppointmentForAnUser = async (req, res) => {
             $and: [{ userid: Patient_id },
             { status: "pending" }
             ]
-        }).populate("doctorid");
+        }).sort({appointmentDate:-1}).populate("doctorid");
 
         const allappointmentbytoken = await AppointmentTokenModel.find({
             $and: [{ userid: Patient_id },
             { status: "pending" }
             ]
-        }).populate("doctorid")
+        }).sort({appointmentDate:-1}).populate("doctorid")
         try {
             // if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
             //     return res.send(success(200, "no appointment found by this doctor"));
@@ -440,12 +441,12 @@ const getCompletedAppointmentsForAnUser = async (req, res) => {
         $and: [{ userid: Patient_id },
         { status: "completed" }
         ]
-    }).populate("doctorid");
+    }).sort({appointmentDate:-1}).populate("doctorid");
     const allappointmentbytoken = await AppointmentTokenModel.find({
         $and: [{ userid: Patient_id },
         { status: "completed" }
         ]
-    }).populate("doctorid")
+    }).sort({appointmentDate:-1}).populate("doctorid")
     try {
         if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
             return res.send(success(200, "no appointment found by this doctor"));
