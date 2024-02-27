@@ -718,7 +718,27 @@ const appointmentstatusfordoctor = async (req, res) => {
     }
 }
 
+
+
+const AppointmentGotoMissed =async (req,res)=>{
+    const date = new Date();
+    const Appointtokengotomissed = await AppointmentTokenModel.find({$and:[{appointmentDate:{$lt:date}},{status:"pending"}]})
+    console.log(Appointtokengotomissed)
+    console.log(Appointtokengotomissed.length)
+    for(let Appointment of Appointtokengotomissed){
+         const updateAppointmentstatus = await AppointmentTokenModel.findByIdAndUpdate({_id:Appointment._id},{status:"missed"},{new:true})
+    }
+    const AppointSlotgotomissed = await AppointmentModel.find({appointmentDate:{$lt:date}})
+    console.log(AppointSlotgotomissed);
+    for( let AppointmentSlot of AppointSlotgotomissed){
+        const updateAppointmentstatus = await AppointmentModel.findByIdAndUpdate({_id:AppointmentSlot._id},{status:"missed"},{new:true})
+   }
+}
+
+
+
 export {
+    AppointmentGotoMissed,
     getallappointmentsforparticularhospitalidmissed,
     getallappointmentsByTokenforparticularhospitalidmissed,
     getallappointmentsforparticularhospitalidcompleted,

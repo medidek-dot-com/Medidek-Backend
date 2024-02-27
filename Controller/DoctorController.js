@@ -125,8 +125,14 @@ const getAllDoctorWithAllQuery = async (req, res) => {
   // const enterFullAddress = req.query.landmark || ""
 
   try {
+    let limit;
     const userInput = req.query.userInput;
-
+    if(userInput){
+      limit =10
+    }
+    else{
+      limit = 50
+    }
     // Use the user input to search the database in all specified keys
     const doctors = await Doctor.find({
       $or: [
@@ -136,7 +142,7 @@ const getAllDoctorWithAllQuery = async (req, res) => {
         { landmark: new RegExp(userInput, 'i') },
         // { connsultationFee: new RegExp(userInput, 'i') }
       ]
-    });
+    }).limit(limit);
 
     return res.send(success(200, doctors));
 
