@@ -1,7 +1,7 @@
 
 
 import express from 'express'
-import { usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword, userprofileupdate } from '../Controller/Userpatient.js';
+import { usersignup, usersignin, userpasswordupdated, userforgotpassword, isUserExist, usergetalldoctors, changepassword, userprofileupdate, findUserByEmailOrPhone, } from '../Controller/Userpatient.js';
 import { requireUser } from '../Middleware/requireUser.js'
 import multer from "multer";
 import { Searchdoctorbylocation, Searchdoctorbyuser } from '../Controller/searchcontroller.js';
@@ -18,6 +18,8 @@ userCreationRouter.get('/getusergetalldoctors', usergetalldoctors)
 userCreationRouter.post('/FindUserByNameAndPassword', usersignin)
 userCreationRouter.post('/forgotpassword', userforgotpassword)
 userCreationRouter.get('/searchdoctor/:lat/:long', Searchdoctorbyuser)
+
+userCreationRouter.post('/findPatientByEmailOrPhone', findUserByEmailOrPhone);
 
 
 userCreationRouter.post('/doctorsByLocation', Searchdoctorbylocation)

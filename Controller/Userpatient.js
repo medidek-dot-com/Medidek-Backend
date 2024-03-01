@@ -1,8 +1,4 @@
 
-
-
-
-
 import { userpatient } from "../Models/Userpatition.js";
 import { Otp } from "../Models/otpSchema.js";
 import { error, success } from "../Utils/responseWrapper.js";
@@ -18,34 +14,60 @@ import { uploadFile } from "../Middleware/s3.js";
 const generateFileName = (bytes = 32) =>
     crypto.randomBytes(bytes).toString("hex");
 
+const findUserByEmailOrPhone = async (req, res) => {
+    const { emailOrPhone } = req.body;
+    if (!emailOrPhone) return res.send((error(401, 'Email or phone is required')));
+
+    try {
+        if (typeof emailOrPhone === "string") {
+            const patientUser = await userpatient.findOne({ email: emailOrPhone });
+            const doctorUser = await Doctor.findOne({ email: emailOrPhone });
+            const masterUser = await Master.findOne({ email: emailOrPhone });
+            if (!patientUser && !doctorUser && !masterUser) return res.send(error(404, 'User Not Registered'));
+            if (patientUser) return res.send(success(200, "Patient"));
+
+            if (doctorUser) return res.send(success(200, "Doctor"));
+
+            if (masterUser) return res.send(success(200, "Master"));
+        } else {
+            const patientUser = await userpatient.findOne({ phone: emailOrPhone });
+            const doctorUser = await Doctor.findOne({ phone: emailOrPhone });
+            const masterUser = await Master.findOne({ phone: emailOrPhone });
+            if (!patientUser && !doctorUser && !masterUser) return res.send(error(404, 'User Not Registered'));
+            if (patientUser) return res.send(success(200, "Patient"));
+
+            if (doctorUser) return res.send(success(200, "Doctor"));
+
+            if (masterUser) return res.send(success(200, "Master"));
+        }
+    } catch (error) {
+        return res.send(error(e.message));
+    }
+
+
+    try {
+
+
+
+
+    } catch (e) {
+    }
+
+}
 
 const usergetalldoctors = async (req, res) => {
 
     try {
         const alldoctors = await Doctor.find({});
-        let newarr = [];
-        for (let doctor of alldoctors) {
-            var getdocts = await Doctor.find({ doctorid: doctor.doctorid });
-            if (newarr.length == 0) {
-                newarr.push(getdocts[0])
+        const doctorSet = new Set();
+        const uniqueDoctors = [];
+        alldoctors.forEach((doctor) => {
+            if (!doctorSet.has(doctor.doctorid)) {
+                uniqueDoctors.push(doctor);
+                doctorSet.add(doctor.doctorid);
             }
-            else {
-                for (let i = 0; i < newarr.length; i++) {
-                    let c = i;
-                    if (newarr[c].doctorid === getdocts[0].doctorid) {
-                        break;
-                    }
-                    else {
-                        c++;
-                    }
-                    if (c == newarr.length) {
-                        newarr.push(getdocts[0])
-                        break;
-                    }
-                }
-            }
-        }
-        return res.send(success(200, newarr))
+        });
+        return res.send(success(200, uniqueDoctors))
         // return res.send(success(200,alldoctors))
     } catch (e) {
         return res.send(error(e.message))
@@ -229,7 +251,7 @@ const userpasswordupdated = async (req, res) => {
     try {
         if (role === "PATIENT") {
             const result = await userpatient.findOne({ phone });
-            if(!result) return res.send(error(404, "User Not Found"));
+            if (!result) return res.send(error(404, "User Not Found"));
             const hashedPassword = await bcrypt.hash(password, 10);
             result.password = hashedPassword;
             result.save();
@@ -237,7 +259,7 @@ const userpasswordupdated = async (req, res) => {
         }
         if (role === "DOCTOR") {
             const result = await Doctor.findOne({ phone });
-            if(!result) return res.send(error(404, "User Not Found"));
+            if (!result) return res.send(error(404, "User Not Found"));
             const hashedPassword = await bcrypt.hash(password, 10);
             result.password = hashedPassword;
             result.save();
@@ -245,15 +267,15 @@ const userpasswordupdated = async (req, res) => {
         }
         if (role === "MASTER") {
             const result = await Master.findOne({ phone });
-            if(!result) return res.send(error(404, "User Not Found"));
+            if (!result) return res.send(error(404, "User Not Found"));
             const hashedPassword = await bcrypt.hash(password, 10);
             result.password = hashedPassword;
             result.save();
             return res.send(success(200, { msg: "user password updated succesfully" }));
         }
-        
+
     } catch (e) {
-       return res.send(error(500, e.message)); 
+        return res.send(error(500, e.message));
     }
 }
 
@@ -347,6 +369,7 @@ const changepassword = async (req, res) => {
         return res.send(error(500, e.message));
     }
 }
+
 export {
     usersignup,
     usersignin,
@@ -355,6 +378,7 @@ export {
     isUserExist,
     usergetalldoctors,
     changepassword,
-    userprofileupdate
+    userprofileupdate,
+    findUserByEmailOrPhone
 }
 

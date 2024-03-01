@@ -4,6 +4,8 @@ import { error, success } from "../Utils/responseWrapper.js";
 
 
 
+
+
 const Searchdoctorbyuser = async (req, res) => {
     const { lat, long } = req.params;
     if (!lat || !long) {
