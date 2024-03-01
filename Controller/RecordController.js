@@ -1,4 +1,4 @@
-import { getObjectSignedUrl, uploadFile } from "../Middleware/s3.js";
+import { deleteFile, getObjectSignedUrl, uploadFile } from "../Middleware/s3.js";
 import { MedicalHistory } from "../Models/Records.js"
 import { error, success } from "../Utils/responseWrapper.js"
 import crypto from "crypto";
@@ -43,6 +43,14 @@ const getRecordforPatient = async (req, res) => {
   }
 }
 
+const deleterecord =async(req,res)=>{
+  const id =req.params.id;
+  const uniquedata = await MedicalHistory.findById({_id:id});
+  console.log(uniquedata.img)
+  await deleteFile(uniquedata.img);
+  await MedicalHistory.findByIdAndDelete({_id:uniquedata._id});
+  res.send(uniquedata);
+}
 
 
 
@@ -51,5 +59,6 @@ const getRecordforPatient = async (req, res) => {
 
 
 
-export { RecordCreation, getRecordforPatient }
+
+export { RecordCreation, getRecordforPatient,deleterecord }
 

@@ -205,8 +205,15 @@ const changeappointmentstatus = async (req, res) => {
     const { id } = req.params;
     const { status, remark } = req.body;
     try {
-        const chnageappointmentstatusbydoctor = await AppointmentModel.findByIdAndUpdate({ _id: id }, { status, remark }, { new: true });
+        const chnageappointmentbyslot = await AppointmentModel.findByIdAndUpdate({ _id: id }, { status, remark }, { new: true });
+        if(chnageappointmentbyslot){
+            return res.send(success(200, "status changed succesfully")); 
+        }
+        const chnageappointmentstatus = await AppointmentTokenModel.findByIdAndUpdate({ _id: id }, { status, remark }, { new: true });
+        if(chnageappointmentstatus){
         return res.send(success(200, "status changed succesfully"));
+        }
+        
     } catch (e) {
         return res.send(error(500, e.message));
     }
@@ -381,13 +388,14 @@ const getUpcomingAppointmentForAnUser = async (req, res) => {
             $and: [{ userid: doctorid },
             { status: "pending" }
             ]
-        }).populate("doctorid");
+        }).sort({appointmentDate:-1}).populate("doctorid");
 
-        const allappointmentbytoken = await AppointmentTokenModel.find({
+        const allappointmentbytoken = await Appoint
+        mentTokenModel.find({
             $and: [{ doctorid: doctorid },
             { status: "pending" }
             ]
-        })
+        }).sort({appointmentDate:-1}).populate("doctorid")
         try {
             // if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
             //     return res.send(success(200, "no appointment found by this doctor"));
@@ -403,13 +411,13 @@ const getUpcomingAppointmentForAnUser = async (req, res) => {
             $and: [{ userid: Patient_id },
             { status: "pending" }
             ]
-        }).populate("doctorid");
+        }).sort({appointmentDate:-1}).populate("doctorid");
 
         const allappointmentbytoken = await AppointmentTokenModel.find({
             $and: [{ userid: Patient_id },
             { status: "pending" }
             ]
-        }).populate("doctorid")
+        }).sort({appointmentDate:-1}).populate("doctorid")
         try {
             // if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
             //     return res.send(success(200, "no appointment found by this doctor"));
@@ -433,12 +441,12 @@ const getCompletedAppointmentsForAnUser = async (req, res) => {
         $and: [{ userid: Patient_id },
         { status: "completed" }
         ]
-    }).populate("doctorid");
+    }).sort({appointmentDate:-1}).populate("doctorid");
     const allappointmentbytoken = await AppointmentTokenModel.find({
         $and: [{ userid: Patient_id },
         { status: "completed" }
         ]
-    }).populate("doctorid")
+    }).sort({appointmentDate:-1}).populate("doctorid")
     try {
         if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
             return res.send(success(200, "no appointment found by this doctor"));
@@ -459,17 +467,16 @@ const getMissedAppointmentsForAnUser = async (req, res) => {
                 userid: Patient_id,
                 status: { $in: ["missed", "cancelled"] }
             }
-        ).populate("doctorid");
+        ).sort({appointmentDate:-1}).populate("doctorid");
         const allappointmentbytoken = await AppointmentTokenModel.find(
             {
                 userid: Patient_id,
                 status: { $in: ["missed", "cancelled"] }
             }
-        ).populate("doctorid")
+        ).sort({appointmentDate:-1}).populate("doctorid")
         // if (allappointment.length === 0 || allappointmentbytoken.length === 0) {
         //     return res.send(success(200, "no appointment found by this doctor"));
         // }
-
         return res.send(success(200, [...allappointment, ...allappointmentbytoken]));
     } catch (e) {
         return res.send(error(500, e.message));
@@ -711,7 +718,27 @@ const appointmentstatusfordoctor = async (req, res) => {
     }
 }
 
+
+
+const AppointmentGotoMissed =async (req,res)=>{
+    const date = new Date();
+    const Appointtokengotomissed = await AppointmentTokenModel.find({$and:[{appointmentDate:{$lt:date}},{status:"pending"}]})
+    console.log(Appointtokengotomissed)
+    console.log(Appointtokengotomissed.length)
+    for(let Appointment of Appointtokengotomissed){
+         const updateAppointmentstatus = await AppointmentTokenModel.findByIdAndUpdate({_id:Appointment._id},{status:"missed"},{new:true})
+    }
+    const AppointSlotgotomissed = await AppointmentModel.find({appointmentDate:{$lt:date}})
+    console.log(AppointSlotgotomissed);
+    for( let AppointmentSlot of AppointSlotgotomissed){
+        const updateAppointmentstatus = await AppointmentModel.findByIdAndUpdate({_id:AppointmentSlot._id},{status:"missed"},{new:true})
+   }
+}
+
+
+
 export {
+    AppointmentGotoMissed,
     getallappointmentsforparticularhospitalidmissed,
     getallappointmentsByTokenforparticularhospitalidmissed,
     getallappointmentsforparticularhospitalidcompleted,

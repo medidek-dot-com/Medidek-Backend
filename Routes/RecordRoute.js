@@ -1,5 +1,5 @@
 import express from 'express'
-import { RecordCreation, getRecordforPatient } from '../Controller/RecordController.js';
+import { RecordCreation, deleterecord, getRecordforPatient } from '../Controller/RecordController.js';
 import { uploadRecord } from '../Multer/MedicalRecordsConfig.js';
 import { requireUser } from '../Middleware/requireUser.js';
 import multer from "multer";
@@ -10,6 +10,7 @@ const Record = express.Router();
 
 Record.post('/uploadRecord/:id', requireUser, upload.single("image"), RecordCreation)
 Record.get("/getRecordOfPatient/:id", requireUser, getRecordforPatient)
+Record.delete("/deleterecord/:id", requireUser, deleterecord)
 
 export { Record }
 

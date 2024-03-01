@@ -20,9 +20,18 @@ import { adminmasterRouter } from './Routes/Adminmaster.js'
 import { admindoctorRouter } from './Routes/Admindoctorroute.js'
 import { blogRouter } from './Routes/BlogRoute.js'
 import { dynamicAddingDoctorsRouter } from './Routes/DynamicAddingDoctors.js'
+import cron from 'node-cron'
+import { AppointmentGotoMissed } from './Controller/Appointment.js'
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+
+
+cron.schedule('0 0 * * *', () => {
+  AppointmentGotoMissed()
+});
+
 
 //Middleware
 app.use(express.json());

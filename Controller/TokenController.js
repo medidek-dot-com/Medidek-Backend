@@ -1,3 +1,5 @@
+import moment from "moment";
+import { Doctor } from "../Models/AddDoctors.js";
 import { Tokens } from "../Models/Token.js";
 import { AppointmentTokenModel } from "../Models/tokencreate.js";
 import { success, error } from "../Utils/responseWrapper.js";
@@ -135,4 +137,40 @@ const bookappointmentbytoken = async (req, res) => {
 }
 
 
-export { createToken, getTokenData, bookappointmentbytoken };
+
+
+const scheduleappointmentfordoctor =async(req,res)=>{
+
+    // const alldoctors = await Doctor.find({});
+
+    // for(let i =0; i<alldoctors.length; i++){
+     
+    //     const id = alldoctors[i]?._id;
+    //     const currentDate = moment();
+    //     for(i=0;i<90;i++){
+    //         const date =currentDate.clone().add(i, 'days')
+    //         const newdate = new Date(date);
+    //         const data = await Tokens.create({
+    //             doctor_id:id,
+    //             date:newdate,
+    //             Starttime1:"07:00",
+    //             Endtime1:"09:00",
+    //             Starttime2:"11:00",
+    //             Endtime2:"13:00",
+    //             Starttime3:"15:00",
+    //             Endtime3:'17:00',
+    //         }) 
+    //         console.log(data);
+    //         console.log(i);
+    //     }
+       
+    // }
+
+    const tokens = await Tokens.find({});
+     return res.status(200).send({tokens:tokens.length});
+}
+
+
+
+
+export { createToken, getTokenData, bookappointmentbytoken,scheduleappointmentfordoctor };
